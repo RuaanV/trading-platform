@@ -1,0 +1,19 @@
+name: 'trading_platform'
+version: '1.0.0'
+config-version: 2
+
+profile: 'trading_platform'
+
+model-paths: ['models']
+
+target-path: 'target'
+clean-targets:
+  - 'target'
+  - 'dbt_packages'
+
+models:
+  trading_platform:
+    staging:
+      +materialized: view
+    features:
+      +materialized: table

@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+
+# Tooling
+.ipynb_checkpoints/
+.mypy_cache/
+.ruff_cache/
+
+# Local env / secrets
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# OS/editor
+.DS_Store
+.vscode/
