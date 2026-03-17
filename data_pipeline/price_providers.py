@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import os
+import threading
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Iterable
+from collections import deque
 
 import requests
 import yfinance as yf
@@ -42,8 +45,51 @@ class SymbolMatch:
     currency: str | None = None
 
 
+_RATE_LIMIT_LOCK = threading.Lock()
+_RATE_LIMIT_WINDOWS: dict[str, deque[float]] = {}
+_DEFAULT_RATE_LIMIT = 60
+_RATE_LIMIT_PERIOD_SECONDS = 60.0
+
+
 def _utc_now() -> datetime:
     return datetime.now(timezone.utc)
+
+
+def _provider_rate_limit(provider: str) -> int:
+    specific = os.getenv(f"{provider.strip().upper()}_RATE_LIMIT_PER_MINUTE")
+    if specific:
+        return max(1, int(specific))
+    shared = os.getenv("MARKET_DATA_RATE_LIMIT_PER_MINUTE")
+    if shared:
+        return max(1, int(shared))
+    return _DEFAULT_RATE_LIMIT
+
+
+def _wait_for_rate_limit(provider: str) -> None:
+    normalized = provider.strip().lower()
+    limit = _provider_rate_limit(normalized)
+
+    while True:
+        wait_time = 0.0
+        with _RATE_LIMIT_LOCK:
+            now = time.monotonic()
+            window = _RATE_LIMIT_WINDOWS.setdefault(normalized, deque())
+            while window and now - window[0] >= _RATE_LIMIT_PERIOD_SECONDS:
+                window.popleft()
+
+            if len(window) < limit:
+                window.append(now)
+                return
+
+            wait_time = _RATE_LIMIT_PERIOD_SECONDS - (now - window[0])
+
+        if wait_time > 0:
+            time.sleep(wait_time)
+
+
+def _rate_limited_get(provider: str, url: str, **kwargs) -> requests.Response:
+    _wait_for_rate_limit(provider)
+    return requests.get(url, **kwargs)
 
 
 def _parse_timestamp(value: str | int | float | None) -> str:
@@ -120,7 +166,8 @@ def get_massive_latest_price(
     api_base = (base_url or os.getenv("MASSIVE_BASE_URL") or "https://api.polygon.io").rstrip("/")
 
     # Prefer a near real-time last trade endpoint.
-    realtime_response = requests.get(
+    realtime_response = _rate_limited_get(
+        "massive",
         f"{api_base}/v2/last/trade/{symbol.upper()}",
         params={"apiKey": key},
         timeout=30,
@@ -142,7 +189,8 @@ def get_massive_latest_price(
             )
 
     # Fallback: previous close if real-time endpoint is unavailable for the plan/ticker.
-    prev_response = requests.get(
+    prev_response = _rate_limited_get(
+        "massive",
         f"{api_base}/v2/aggs/ticker/{symbol.upper()}/prev",
         params={"adjusted": "true", "apiKey": key},
         timeout=30,
@@ -199,7 +247,8 @@ def get_massive_history(
 
     api_base = (base_url or os.getenv("MASSIVE_BASE_URL") or "https://api.polygon.io").rstrip("/")
     start, end = _period_to_dates(period)
-    response = requests.get(
+    response = _rate_limited_get(
+        "massive",
         f"{api_base}/v2/aggs/ticker/{symbol.upper()}/range/1/day/{start}/{end}",
         params={"adjusted": "true", "sort": "asc", "limit": 50000, "apiKey": key},
         timeout=30,
@@ -233,7 +282,8 @@ def get_finnhub_latest_price(symbol: str, api_key: str | None = None) -> PriceQu
     if not key:
         raise PriceProviderError("Missing FINNHUB_API_KEY for Finnhub provider")
 
-    response = requests.get(
+    response = _rate_limited_get(
+        "finnhub",
         "https://finnhub.io/api/v1/quote",
         params={"symbol": symbol.upper(), "token": key},
         timeout=30,
@@ -281,7 +331,8 @@ def search_massive_symbols(query: str, api_key: str | None = None) -> list[Symbo
     if not key:
         return []
 
-    response = requests.get(
+    response = _rate_limited_get(
+        "massive",
         f"{(os.getenv('MASSIVE_BASE_URL') or 'https://api.polygon.io').rstrip('/')}/v3/reference/tickers",
         params={"search": query, "active": "true", "limit": 10, "apiKey": key},
         timeout=30,
@@ -312,7 +363,8 @@ def search_finnhub_symbols(query: str, api_key: str | None = None) -> list[Symbo
     if not key:
         return []
 
-    response = requests.get(
+    response = _rate_limited_get(
+        "finnhub",
         "https://finnhub.io/api/v1/search",
         params={"q": query, "token": key},
         timeout=30,

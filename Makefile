@@ -27,6 +27,7 @@ help:
 	@echo "  make run-backtest       - run a simple walk-forward recommender backtest"
 	@echo "  make test-recommender   - run unit tests for the recommender rules"
 	@echo "  make test-analytics     - run analytics and backtesting unit tests"
+	@echo "  make test-providers     - run provider and rate-limiter unit tests"
 	@echo "  make run-pipeline       - run full local pipeline sequence"
 	@echo "  make run-dashboard      - start Streamlit dashboard"
 	@echo "  make init-portfolios    - create the personal portfolios table in Postgres"
@@ -89,6 +90,9 @@ test-recommender: venv
 
 test-analytics: venv
 	$(PY) -m unittest tests.test_backtesting_workflow
+
+test-providers: venv
+	$(PY) -m unittest tests.test_price_provider_rate_limit
 
 run-pipeline: run-ingestion run-features run-training run-scoring run-strategy run-recommender
 
