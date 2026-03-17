@@ -1,0 +1,5 @@
+symbol,company,portfolio_name,current_weight,return_3m,return_6m,volatility_3m,volatility_6m,max_drawdown_6m,relative_return_3m,relative_return_6m,as_of
+GOOG,GOOG,SIPP,0.3327,-0.0609,0.252,0.2162,0.2598,-0.1351,,,2026-03-13T00:00:00+00:00
+AAPL,AAPL,SIPP,0.0504,-0.1028,0.0873,0.2321,0.2214,-0.138,,,2026-03-13T00:00:00+00:00
+AMZN,AMZN,SIPP,0.1513,-0.104,-0.0969,0.2808,0.307,-0.2174,,,2026-03-13T00:00:00+00:00
+MSFT,MSFT,SIPP,0.1792,-0.1735,-0.2105,0.3077,0.2583,-0.2907,,,2026-03-13T00:00:00+00:00

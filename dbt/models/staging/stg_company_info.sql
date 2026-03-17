@@ -1,0 +1,20 @@
+select
+    symbol,
+    extracted_at::timestamptz as extracted_at,
+    short_name,
+    sector,
+    industry,
+    country,
+    currency,
+    market_cap::numeric as market_cap,
+    enterprise_value::numeric as enterprise_value,
+    trailing_pe::numeric as trailing_pe,
+    forward_pe::numeric as forward_pe,
+    beta::numeric as beta,
+    return_on_assets::numeric as return_on_assets,
+    return_on_equity::numeric as return_on_equity,
+    total_revenue::numeric as total_revenue,
+    gross_profits::numeric as gross_profits,
+    ebitda::numeric as ebitda,
+    long_business_summary
+from {{ source('raw', 'company_info') }}

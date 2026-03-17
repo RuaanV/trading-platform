@@ -1,0 +1,4 @@
+symbol,action,recommendation_score,target_weight,expected_return,risk_score,confidence,rank,company,portfolio_name,generated_at,rationale
+MSFT,ADD,0.27,0.12,0.62,0.38,0.658,1,MSFT,SIPP,2026-03-16T17:46:47.999298+00:00,"ADD because expected return is 0.62, risk score is 0.38, confidence is 0.66, and the symbol is existing weight 12.3%."
+AAPL,HOLD,0.2419,0.0345,0.57,0.43,0.613,2,AAPL,SIPP,2026-03-16T17:46:47.999298+00:00,"HOLD because expected return is 0.57, risk score is 0.43, confidence is 0.61, and the symbol is existing weight 3.4%."
+GOOG,TRIM,0.0664,0.08,0.55,0.45,0.595,3,GOOG,SIPP,2026-03-16T17:46:47.999298+00:00,"TRIM because expected return is 0.55, risk score is 0.45, confidence is 0.60, concentration is above the soft limit, and the symbol is existing weight 22.8%."

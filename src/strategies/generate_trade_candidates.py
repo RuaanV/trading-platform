@@ -10,7 +10,7 @@ CANDIDATES_PATH = Path("models/trained_models/trade_candidates.csv")
 def generate_trade_candidates() -> None:
     CANDIDATES_PATH.parent.mkdir(parents=True, exist_ok=True)
     CANDIDATES_PATH.write_text(
-        "symbol,side,score,rank\nMSFT,BUY,0.62,1\nAAPL,BUY,0.57,2\n",
+        "symbol,side,score,rank\nMSFT,BUY,0.62,1\nAAPL,BUY,0.57,2\nGOOG,BUY,0.55,3\n",
         encoding="utf-8",
     )
     print(

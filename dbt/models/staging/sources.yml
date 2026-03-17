@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: company_info
+      - name: major_holders
+      - name: institutional_holders
+      - name: balance_sheet
