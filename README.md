@@ -5,16 +5,19 @@ This repository contains a personal trading platform focused on:
 - managing existing portfolios and their snapshots
 - generating and tracking portfolio recommendations
 - monitoring market, company, and eventually news-driven indicators that affect those portfolios
+- using stock and market calendar data such as earnings, dividends, splits, and economic events as monitoring inputs
+- introducing scheduling and automation later, once the core concept and foundations are proven
 
 The codebase already has the skeleton of that platform in place: Postgres-backed portfolio storage, price and company ingestion, dbt models, a batch recommendation flow, a Streamlit dashboard, and Airflow orchestration scaffolding. Some parts are production-shaped, and some parts are still placeholders.
 
 ## Platform Goal
 
-The target platform is not just a stock screener. It should support three connected jobs:
+The target platform is not just a stock screener. It should support four connected jobs:
 
 1. maintain a trusted view of current portfolios, positions, weights, and snapshot history
 2. produce explainable strategy and recommendation outputs for those portfolios
-3. watch market data, fundamentals, and news/events for indicators that should trigger review, alerts, or portfolio actions
+3. watch market data, fundamentals, news/events, and stock or market calendar events for indicators that should trigger review, alerts, or portfolio actions
+4. add scheduling and automation for refresh, monitoring, reporting, and recurring review workflows once the platform foundations are stable
 
 ## Current Architecture
 
@@ -139,6 +142,7 @@ These limitations should be explicit because they shape the real current archite
 - Fundamentals ingestion is still a stub outside the yfinance company-data ingestion path.
 - Recommendations are written to CSV artifacts, not yet persisted as first-class database entities with lifecycle state.
 - There is no implemented news ingestion, event detection, alerting, or watchlist-monitoring pipeline yet.
+- There is no implemented stock-calendar or market-calendar ingestion pipeline yet.
 - The dashboard is a data viewer, not yet a decision workflow UI.
 
 ## To-Be Architecture
@@ -261,10 +265,15 @@ The list below is based on the current repository state and the stated platform 
 ### Monitoring, signals, and news
 
 - Build a news and event ingestion pipeline because this does not exist yet in the repo.
+- Add stock and market calendar ingestion for earnings dates, dividend events, splits, IPOs, and relevant economic releases.
 - Add indicator monitoring for holdings and watchlists: earnings dates, guidance changes, dividend changes, unusual moves, volatility spikes, and macro events.
 - Create an alerting layer that turns signals into review tasks rather than only storing data.
 - Link signals and news back to affected portfolios, positions, and open recommendations.
 - Add watchlist support for symbols relevant to a strategy but not currently held.
+- Evaluate provider coverage and plan fit for calendar data:
+  yfinance exposes earnings, economic events, IPO, and splits calendars;
+  Massive offers earnings and broader corporate events via partner datasets;
+  Finnhub exposes IPO and earnings calendars and also supports economic calendar data.
 
 ### User experience and workflow
 
@@ -279,6 +288,14 @@ The list below is based on the current repository state and the stated platform 
 - Add reliable job-level logging, retry strategy, run metadata, and failure alerting.
 - Define data freshness expectations for each dataset and expose stale-data warnings in the platform.
 - Add environment-specific configuration for local development versus scheduled production-style runs.
+
+### Scheduling and automation
+
+- Define which workflows should remain manual during concept validation and which should become scheduled first.
+- Add recurring automation for portfolio refresh, signal checks, report generation, and review reminders only after the underlying data and recommendation flows are trusted.
+- Introduce automation guardrails so scheduled jobs do not generate low-quality or duplicate recommendations from unstable inputs.
+- Add operational controls for automation runs: run windows, dependencies, retries, pause or resume controls, and audit logs.
+- Keep this as a later-phase workstream while the platform foundations, data quality, and recommendation logic are being built and tested.
 
 ### Quality, governance, and safety
 
@@ -295,8 +312,10 @@ If the goal is to make the platform useful quickly for real portfolio management
 2. persist recommendations and strategy metadata in the database
 3. implement real feature, model, scoring, and candidate pipelines
 4. build monitoring and news/event ingestion
-5. upgrade the dashboard into a review and alert workflow UI
-6. harden orchestration, tests, and auditability
+5. add stock and market calendar ingestion and alerting
+6. upgrade the dashboard into a review and alert workflow UI
+7. harden orchestration, tests, and auditability
+8. introduce scheduling and automation once the concept, data flows, and decision logic are stable
 
 ## Repository Layout
 
@@ -381,7 +400,7 @@ The repo currently supports latest-price and historical-price retrieval with yfi
 
 ```bash
 export PRICE_SYMBOL=AAPL
-export YF_SYMBOLS=AAPL,GOOG,MSFT
+export YF_SYMBOLS=AAPL,AMZN,GOOG,MSFT,BA.L
 export PRICE_PROVIDER=both
 export MASSIVE_API_KEY=your_key_here
 export MASSIVE_BASE_URL=https://api.polygon.io

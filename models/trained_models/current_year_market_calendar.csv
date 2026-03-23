@@ -1,0 +1,20 @@
+symbol,company,event_type,event_name,event_date,event_timestamp,calendar_year,source_provider,source_payload,extracted_at
+AAPL,Apple Inc.,dividend,Ex-Dividend Date,2026-02-09,2026-02-09T00:00:00+00:00,2026,yfinance,"{""Ex-Dividend Date"": ""2026-02-09""}",2026-03-19T08:47:43.460234+00:00
+AAPL,Apple Inc.,dividend,Dividend,2026-02-09,2026-02-09T05:00:00+00:00,2026,yfinance,"{""dividends"": 0.26, ""timestamp"": ""2026-02-09T05:00:00+00:00""}",2026-03-19T08:47:43.460234+00:00
+AAPL,Apple Inc.,dividend,Dividend Date,2026-02-12,2026-02-12T00:00:00+00:00,2026,yfinance,"{""Dividend Date"": ""2026-02-12""}",2026-03-19T08:47:43.460234+00:00
+AAPL,Apple Inc.,earnings,Earnings Date,2026-04-30,2026-04-30T00:00:00+00:00,2026,yfinance,"{""Earnings Date"": [""2026-04-30""]}",2026-03-19T08:47:43.460234+00:00
+AMZN,"Amazon.com, Inc.",earnings,Earnings Date,2026-04-30,2026-04-30T00:00:00+00:00,2026,yfinance,"{""Earnings Date"": [""2026-04-30""]}",2026-03-19T08:47:43.460234+00:00
+BA.L,BAE SYSTEMS PLC ORD 2.5P,earnings,Earnings Date,2026-02-18,2026-02-18T00:00:00+00:00,2026,yfinance,"{""Earnings Date"": [""2026-02-18""]}",2026-03-19T08:47:43.460234+00:00
+BA.L,BAE SYSTEMS PLC ORD 2.5P,dividend,Ex-Dividend Date,2026-04-23,2026-04-23T00:00:00+00:00,2026,yfinance,"{""Ex-Dividend Date"": ""2026-04-23""}",2026-03-19T08:47:43.460234+00:00
+GOOG,Alphabet Inc.,dividend,Ex-Dividend Date,2026-03-09,2026-03-09T00:00:00+00:00,2026,yfinance,"{""Ex-Dividend Date"": ""2026-03-09""}",2026-03-19T08:47:43.460234+00:00
+GOOG,Alphabet Inc.,dividend,Dividend,2026-03-09,2026-03-09T04:00:00+00:00,2026,yfinance,"{""dividends"": 0.21, ""timestamp"": ""2026-03-09T04:00:00+00:00""}",2026-03-19T08:47:43.460234+00:00
+GOOG,Alphabet Inc.,dividend,Dividend Date,2026-03-16,2026-03-16T00:00:00+00:00,2026,yfinance,"{""Dividend Date"": ""2026-03-16""}",2026-03-19T08:47:43.460234+00:00
+GOOG,Alphabet Inc.,earnings,Earnings Date,2026-04-23,2026-04-23T00:00:00+00:00,2026,yfinance,"{""Earnings Date"": [""2026-04-23""]}",2026-03-19T08:47:43.460234+00:00
+MSFT,Microsoft Corporation,dividend,Dividend,2026-02-19,2026-02-19T05:00:00+00:00,2026,yfinance,"{""dividends"": 0.91, ""timestamp"": ""2026-02-19T05:00:00+00:00""}",2026-03-19T08:47:43.460234+00:00
+MSFT,Microsoft Corporation,dividend,Dividend Date,2026-03-12,2026-03-12T00:00:00+00:00,2026,yfinance,"{""Dividend Date"": ""2026-03-12""}",2026-03-19T08:47:43.460234+00:00
+MSFT,Microsoft Corporation,earnings,Earnings Date,2026-04-29,2026-04-29T00:00:00+00:00,2026,yfinance,"{""Earnings Date"": [""2026-04-29""]}",2026-03-19T08:47:43.460234+00:00
+MSFT,Microsoft Corporation,dividend,Ex-Dividend Date,2026-05-21,2026-05-21T00:00:00+00:00,2026,yfinance,"{""Ex-Dividend Date"": ""2026-05-21""}",2026-03-19T08:47:43.460234+00:00
+NVDA,NVIDIA Corporation,dividend,Ex-Dividend Date,2026-03-11,2026-03-11T00:00:00+00:00,2026,yfinance,"{""Ex-Dividend Date"": ""2026-03-11""}",2026-03-19T08:47:43.460234+00:00
+NVDA,NVIDIA Corporation,dividend,Dividend,2026-03-11,2026-03-11T04:00:00+00:00,2026,yfinance,"{""dividends"": 0.01, ""timestamp"": ""2026-03-11T04:00:00+00:00""}",2026-03-19T08:47:43.460234+00:00
+NVDA,NVIDIA Corporation,dividend,Dividend Date,2026-04-01,2026-04-01T00:00:00+00:00,2026,yfinance,"{""Dividend Date"": ""2026-04-01""}",2026-03-19T08:47:43.460234+00:00
+NVDA,NVIDIA Corporation,earnings,Earnings Date,2026-05-20,2026-05-20T00:00:00+00:00,2026,yfinance,"{""Earnings Date"": [""2026-05-20""]}",2026-03-19T08:47:43.460234+00:00

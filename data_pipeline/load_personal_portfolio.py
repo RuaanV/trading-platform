@@ -42,6 +42,11 @@ MANUAL_SYMBOL_OVERRIDES = {
         "provider": "yahoo",
         "name": "Artemis High Income I Acc",
     },
+    "Fundsmith Equity": {
+        "symbol": "0P0000RU81.L",
+        "provider": "yahoo",
+        "name": "Fundsmith Equity I Acc",
+    },
     "Rathbone Global Opportunities": {
         "symbol": "0P0001FE43.L",
         "provider": "yahoo",

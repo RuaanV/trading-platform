@@ -15,7 +15,8 @@ help:
 	@echo "  make install            - install/update requirements into .venv"
 	@echo "  make run-prices-apple   - fetch AAPL latest price using yfinance + Massive"
 	@echo "  make run-ingestion      - run price + fundamentals ingestion"
-	@echo "  make run-company        - ingest company data for AAPL, GOOG, and MSFT into Postgres raw tables"
+	@echo "  make run-company        - ingest company data for AAPL, AMZN, GOOG, MSFT, and BA.L into Postgres raw tables"
+	@echo "  make run-market-calendar - ingest current-year market calendar events for tracked symbols"
 	@echo "  make run-features       - build feature table artifacts"
 	@echo "  make run-training       - train return model artifact"
 	@echo "  make run-scoring        - score universe"
@@ -36,7 +37,7 @@ help:
 	@echo "  make add-cash-holding   - append the current cash balance as a portfolio holding"
 	@echo "  make cleanup-portfolio-snapshots - keep only the seed and latest SIPP snapshots"
 	@echo "  make dbt-run            - execute dbt models"
-	@echo "  make test-aapl-pipeline - run company ingestion + dbt shaping for the AAPL/GOOG/MSFT set"
+	@echo "  make test-aapl-pipeline - run company ingestion + dbt shaping for the AAPL/AMZN/GOOG/MSFT/BA.L set"
 	@echo "  make clean-artifacts    - remove generated model artifacts"
 
 setup: venv install
@@ -57,6 +58,9 @@ run-prices-apple: venv
 
 run-company: venv
 	$(PY) data_pipeline/ingest_company_data.py
+
+run-market-calendar: venv
+	$(PY) data_pipeline/ingest_market_calendar.py
 
 run-features: venv
 	$(PY) src/features/build_features.py

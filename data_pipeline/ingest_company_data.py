@@ -16,7 +16,7 @@ try:
 except ImportError:
     from db import postgres_engine
 
-DEFAULT_SYMBOLS = ("AAPL", "GOOG", "MSFT")
+DEFAULT_SYMBOLS = ("AAPL", "AMZN", "GOOG", "MSFT", "BA.L")
 
 
 def _to_snake_case(name: str) -> str:

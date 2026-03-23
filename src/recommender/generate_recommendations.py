@@ -29,12 +29,21 @@ ACTION_PRIORITY = {
     "EXIT": 5,
 }
 
+SYMBOL_ALIASES = {
+    "BA.": "BA.L",
+}
+
+
+def _normalize_symbol(symbol: object) -> str:
+    normalized = str(symbol or "").strip().upper()
+    return SYMBOL_ALIASES.get(normalized, normalized)
+
 
 def _normalize_holdings(holdings: pd.DataFrame) -> pd.DataFrame:
     if holdings.empty or "ticker" not in holdings.columns:
         return pd.DataFrame(columns=HOLDINGS_COLUMNS)
 
-    holdings["ticker"] = holdings["ticker"].fillna("").astype(str).str.strip().str.upper()
+    holdings["ticker"] = holdings["ticker"].map(_normalize_symbol)
     holdings = holdings[holdings["ticker"] != ""].copy()
     if holdings.empty:
         return pd.DataFrame(columns=HOLDINGS_COLUMNS)
@@ -99,7 +108,7 @@ def _load_scores() -> pd.DataFrame:
 
 def _enrich_scores(scores: pd.DataFrame) -> pd.DataFrame:
     enriched = scores.copy()
-    enriched["symbol"] = enriched["symbol"].astype(str).str.strip().str.upper()
+    enriched["symbol"] = enriched["symbol"].map(_normalize_symbol)
     enriched["score"] = pd.to_numeric(enriched["score"], errors="coerce")
     enriched = enriched.dropna(subset=["symbol", "score"]).copy()
     if "expected_return" not in enriched.columns:
@@ -114,7 +123,7 @@ def _enrich_scores(scores: pd.DataFrame) -> pd.DataFrame:
 def _load_candidates() -> pd.DataFrame:
     if CANDIDATES_PATH.exists():
         candidates = pd.read_csv(CANDIDATES_PATH)
-        candidates["symbol"] = candidates["symbol"].astype(str).str.strip().str.upper()
+        candidates["symbol"] = candidates["symbol"].map(_normalize_symbol)
         if "rank" not in candidates.columns:
             candidates["rank"] = range(1, len(candidates) + 1)
         return candidates

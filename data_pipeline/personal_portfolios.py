@@ -313,6 +313,17 @@ def fetch_portfolio_holdings() -> pd.DataFrame:
             fx_note
         from {PORTFOLIO_SCHEMA}.{SNAPSHOT_TABLE}
         order by portfolio_id, snapshot_at desc, id desc
+    ),
+    holdings_with_prev as (
+        select
+            h.*,
+            lag(h.price) over (
+                partition by h.portfolio_id, upper(coalesce(h.ticker, ''))
+                order by s.snapshot_at asc, s.id asc, h.id asc
+            ) as previous_price
+        from {PORTFOLIO_SCHEMA}.{HOLDINGS_TABLE} h
+        join {PORTFOLIO_SCHEMA}.{SNAPSHOT_TABLE} s
+          on s.id = h.snapshot_id
     )
     select
         p.name as portfolio_name,
@@ -327,6 +338,7 @@ def fetch_portfolio_holdings() -> pd.DataFrame:
         h.quantity,
         h.quantity_label,
         h.price,
+        h.previous_price,
         h.market_value,
         h.total_cost,
         h.gain_loss_value,
@@ -338,7 +350,7 @@ def fetch_portfolio_holdings() -> pd.DataFrame:
     from latest_snapshot ls
     join {PORTFOLIO_SCHEMA}.{PORTFOLIO_TABLE} p
       on p.id = ls.portfolio_id
-    join {PORTFOLIO_SCHEMA}.{HOLDINGS_TABLE} h
+    join holdings_with_prev h
       on h.snapshot_id = ls.id
     order by p.holder, p.name, h.market_value desc nulls last, h.company;
     """

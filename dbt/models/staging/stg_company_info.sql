@@ -10,6 +10,8 @@ select
     enterprise_value::numeric as enterprise_value,
     trailing_pe::numeric as trailing_pe,
     forward_pe::numeric as forward_pe,
+    trailing_eps::numeric as trailing_eps,
+    forward_eps::numeric as forward_eps,
     beta::numeric as beta,
     return_on_assets::numeric as return_on_assets,
     return_on_equity::numeric as return_on_equity,
