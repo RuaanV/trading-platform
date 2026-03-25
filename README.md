@@ -10,6 +10,15 @@ This repository contains a personal trading platform focused on:
 
 The codebase already has the skeleton of that platform in place: Postgres-backed portfolio storage, price and company ingestion, dbt models, a batch recommendation flow, a Streamlit dashboard, and Airflow orchestration scaffolding. Some parts are production-shaped, and some parts are still placeholders.
 
+## Recent Evolution
+
+Recent iterations have moved the repository from a static portfolio viewer toward a more useful monitoring surface:
+
+- The dashboard now shows snapshot-aware holding movement beside the latest price, using up, down, and unchanged indicators based on the previous portfolio snapshot.
+- Holding detail pages now expose stored daily news sentiment summaries and article-level drilldowns for a selected symbol.
+- The agent layer now includes holding news sentiment support and a runnable entrypoint for news-driven portfolio review workflows.
+- The platform still relies on batch refresh patterns, but the UI now does a better job of surfacing what changed between snapshots instead of only showing the latest state.
+
 ## Platform Goal
 
 The target platform is not just a stock screener. It should support four connected jobs:
@@ -115,6 +124,7 @@ src/backtesting/*"]
 - The platform supports importing holdings from CSV exports and preserving snapshot history instead of overwriting the latest state.
 - There is a seeded SIPP workflow with price refresh and symbol resolution in [`data_pipeline/load_personal_portfolio.py`](/Users/ruaan.venter/code/trading-platform/data_pipeline/load_personal_portfolio.py).
 - The dashboard can display portfolios, snapshots, and holdings from Postgres in [`dashboard/streamlit_app.py`](/Users/ruaan.venter/code/trading-platform/dashboard/streamlit_app.py).
+- Holdings in the dashboard now show movement against the previous snapshot directly next to the current `price`, making day-over-day portfolio changes easier to scan.
 
 ### Market and company data
 
@@ -126,6 +136,7 @@ src/backtesting/*"]
 
 - Recommendation generation is implemented in [`src/recommender/generate_recommendations.py`](/Users/ruaan.venter/code/trading-platform/src/recommender/generate_recommendations.py).
 - A baseline portfolio review agent exists in [`src/agents/market_analysis.py`](/Users/ruaan.venter/code/trading-platform/src/agents/market_analysis.py).
+- Holding news sentiment loading, summarisation, and agent entrypoints now exist in [`data_pipeline/holding_news.py`](/Users/ruaan.venter/code/trading-platform/data_pipeline/holding_news.py), [`src/agents/holding_news_sentiment.py`](/Users/ruaan.venter/code/trading-platform/src/agents/holding_news_sentiment.py), and [`src/agents/run_holding_news_agent.py`](/Users/ruaan.venter/code/trading-platform/src/agents/run_holding_news_agent.py).
 - Holdings analytics and recommender backtesting exist in [`src/analytics/evaluate_holdings_history.py`](/Users/ruaan.venter/code/trading-platform/src/analytics/evaluate_holdings_history.py) and [`src/backtesting/backtest_recommender.py`](/Users/ruaan.venter/code/trading-platform/src/backtesting/backtest_recommender.py).
 
 ### Orchestration and transformation
@@ -141,9 +152,9 @@ These limitations should be explicit because they shape the real current archite
 - `build_features`, `train_return_model`, `score_universe`, and part of the strategy flow are still stub implementations that write placeholder artifacts rather than warehouse-backed model outputs.
 - Fundamentals ingestion is still a stub outside the yfinance company-data ingestion path.
 - Recommendations are written to CSV artifacts, not yet persisted as first-class database entities with lifecycle state.
-- There is no implemented news ingestion, event detection, alerting, or watchlist-monitoring pipeline yet.
+- News sentiment display and agent hooks now exist, but there is still no full news ingestion, event detection, alerting, or watchlist-monitoring pipeline yet.
 - There is no implemented stock-calendar or market-calendar ingestion pipeline yet.
-- The dashboard is a data viewer, not yet a decision workflow UI.
+- The dashboard now includes holding-level movement and news context, but it is still a monitoring viewer rather than a full decision workflow UI.
 
 ## To-Be Architecture
 
