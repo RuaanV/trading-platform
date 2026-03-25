@@ -23,6 +23,7 @@ help:
 	@echo "  make run-strategy       - generate ranked trade candidates"
 	@echo "  make run-recommender    - generate portfolio-aware recommendations"
 	@echo "  make run-agent          - run the baseline market analysis agent"
+	@echo "  make run-holding-news   - fetch and score today's Yahoo Finance headlines for a holding"
 	@echo "  make run-history        - fetch historical price history for holdings and benchmarks"
 	@echo "  make run-holdings-report - build 3M/6M holding performance report"
 	@echo "  make run-backtest       - run a simple walk-forward recommender backtest"
@@ -79,6 +80,9 @@ run-recommender: venv
 
 run-agent: venv
 	$(PY) src/agents/run_agent.py
+
+run-holding-news: venv
+	$(PY) src/agents/run_holding_news_agent.py
 
 run-history: venv
 	$(PY) src/backtesting/load_price_history.py

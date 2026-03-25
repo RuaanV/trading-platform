@@ -16,6 +16,7 @@ if str(DATA_PIPELINE_DIR) not in sys.path:
     sys.path.append(str(DATA_PIPELINE_DIR))
 
 from db import postgres_engine
+from holding_news import load_symbol_news_sentiment, summarize_news_sentiment
 from personal_portfolios import (
     ensure_personal_portfolio_tables,
     fetch_personal_portfolios,
@@ -213,6 +214,86 @@ def _load_holding_history(
     return history
 
 
+def _attach_previous_prices(holdings: pd.DataFrame) -> pd.DataFrame:
+    if holdings.empty:
+        return holdings
+    if "previous_price" in holdings.columns and not holdings["previous_price"].isna().all():
+        return holdings
+
+    query = """
+    with latest_snapshot as (
+        select distinct on (portfolio_id)
+            id,
+            portfolio_id,
+            snapshot_at
+        from app.portfolio_snapshots
+        order by portfolio_id, snapshot_at desc, id desc
+    ),
+    holdings_with_prev as (
+        select
+            h.portfolio_id,
+            h.snapshot_id,
+            h.company,
+            h.instrument_name,
+            h.ticker,
+            h.price,
+            lag(h.price) over (
+                partition by h.portfolio_id, upper(coalesce(h.ticker, ''))
+                order by s.snapshot_at asc, s.id asc, h.id asc
+            ) as previous_price
+        from app.portfolio_holdings h
+        join app.portfolio_snapshots s
+          on s.id = h.snapshot_id
+    )
+    select
+        p.name as portfolio_name,
+        p.holder,
+        p.portfolio_type,
+        ls.snapshot_at,
+        h.company,
+        h.instrument_name,
+        h.ticker,
+        h.price,
+        h.previous_price
+    from latest_snapshot ls
+    join app.personal_portfolios p
+      on p.id = ls.portfolio_id
+    join holdings_with_prev h
+      on h.snapshot_id = ls.id
+    """
+    try:
+        previous_prices = pd.read_sql(text(query), postgres_engine())
+    except Exception:
+        return holdings
+
+    if previous_prices.empty:
+        return holdings
+
+    merged = holdings.copy()
+    merge_keys = [
+        "portfolio_name",
+        "holder",
+        "portfolio_type",
+        "snapshot_at",
+        "company",
+        "instrument_name",
+        "ticker",
+        "price",
+    ]
+    if "previous_price" in merged.columns:
+        merged = merged.drop(columns=["previous_price"])
+    merged = merged.merge(previous_prices, on=merge_keys, how="left")
+    return merged
+
+
+@st.cache_data(show_spinner=False)
+def _load_holding_news_sentiment(ticker: str, limit: int = 8) -> pd.DataFrame:
+    try:
+        return load_symbol_news_sentiment(_normalize_symbol(ticker), limit=limit)
+    except Exception:
+        return pd.DataFrame()
+
+
 def _build_holding_detail_frame(holdings: pd.DataFrame) -> pd.DataFrame:
     detail_frame = holdings.copy()
     detail_frame["detail_symbol"] = detail_frame["ticker"].map(_normalize_symbol)
@@ -244,10 +325,10 @@ def _format_price_move(price: object, previous_price: object) -> str:
     if pd.isna(current_numeric) or pd.isna(previous_numeric):
         return ""
     if float(current_numeric) > float(previous_numeric):
-        return "up"
+        return "<span class='holding-move holding-move--up' title='Price increased'>&uarr;</span>"
     if float(current_numeric) < float(previous_numeric):
-        return "down"
-    return "unchanged"
+        return "<span class='holding-move holding-move--down' title='Price decreased'>&darr;</span>"
+    return "<span class='holding-move holding-move--flat' title='No price change'>&rarr;</span>"
 
 
 def _latest_price_direction(history_df: pd.DataFrame) -> str | None:
@@ -269,12 +350,18 @@ def _latest_price_direction(history_df: pd.DataFrame) -> str | None:
 
 def _price_delta_label(direction: str | None) -> str | None:
     if direction == "up":
-        return "+ up"
+        return "↑"
     if direction == "down":
-        return "- down"
+        return "↓"
     if direction == "unchanged":
-        return "0 unchanged"
+        return "→"
     return None
+
+
+def _price_delta_color(direction: str | None) -> str:
+    if direction == "unchanged":
+        return "off"
+    return "normal"
 
 
 def _render_holding_table(holding_frame: pd.DataFrame) -> None:
@@ -295,7 +382,7 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
         axis=1,
     )
     if "price" in display_frame.columns and "previous_price" in display_frame.columns:
-        display_frame["Move"] = display_frame.apply(
+        display_frame["Movement"] = display_frame.apply(
             lambda row: _format_price_move(row.get("price"), row.get("previous_price")),
             axis=1,
         )
@@ -310,10 +397,10 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
     if "Company / Ticker" in ordered_columns:
         ordered_columns.remove("Company / Ticker")
     ordered_columns.insert(company_index, "Company / Ticker")
-    if "Move" in ordered_columns and "price" in ordered_columns:
-        ordered_columns.remove("Move")
+    if "Movement" in ordered_columns and "price" in ordered_columns:
+        ordered_columns.remove("Movement")
         price_index = ordered_columns.index("price")
-        ordered_columns.insert(price_index + 1, "Move")
+        ordered_columns.insert(price_index + 1, "Movement")
     for column in trailing_metadata_columns:
         if column in ordered_columns:
             ordered_columns.remove(column)
@@ -351,6 +438,21 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
         }
         .holding-table-wrap a:hover {
             text-decoration: underline;
+        }
+        .holding-move {
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .holding-move--up {
+            color: #38b000;
+        }
+        .holding-move--down {
+            color: #d62828;
+        }
+        .holding-move--flat {
+            color: #a0a4ab;
         }
         </style>
         """,
@@ -411,6 +513,8 @@ def _render_holding_detail(
     detail_symbol = selected_holding["detail_symbol"]
     company_row = pd.Series(dtype="object")
     recommendation_row = pd.Series(dtype="object")
+    news_frame = _load_holding_news_sentiment(detail_symbol)
+    news_summary = summarize_news_sentiment(news_frame)
 
     if not company_snapshot.empty:
         company_matches = company_snapshot.loc[company_snapshot["symbol"] == detail_symbol]
@@ -445,7 +549,7 @@ def _render_holding_detail(
         "Price",
         _format_currency(selected_holding.get("price")),
         delta=price_delta,
-        delta_color="normal",
+        delta_color=_price_delta_color(price_direction),
     )
 
     _render_holding_history_chart(holding_history if holding_history is not None else pd.DataFrame())
@@ -518,6 +622,49 @@ def _render_holding_detail(
                 hide_index=True,
             )
             st.caption(str(recommendation_row.get("rationale", "")))
+
+    st.markdown("##### News Sentiment")
+    if news_frame.empty or news_summary is None:
+        st.info("No stored daily news sentiment is available for this holding yet.")
+    else:
+        _render_metric_grid(
+            [
+                ("Headlines", str(news_summary.headline_count)),
+                ("Average Sentiment", _format_number(news_summary.average_sentiment_score)),
+                ("Market Tone", news_summary.sentiment_label.title()),
+                ("As Of", news_summary.as_of_date),
+            ]
+        )
+        display_news = news_frame.copy()
+        display_news["local_date"] = (
+            pd.to_datetime(display_news["published_at"], utc=True, errors="coerce")
+            .dt.tz_convert("Europe/London")
+            .dt.date
+        )
+        display_news = display_news.loc[display_news["local_date"].astype(str) == news_summary.as_of_date].copy()
+        display_news["published_at"] = (
+            pd.to_datetime(display_news["published_at"], utc=True, errors="coerce")
+            .dt.tz_convert("Europe/London")
+            .dt.strftime("%Y-%m-%d %H:%M")
+        )
+        display_news["headline"] = display_news.apply(
+            lambda row: (
+                f"<a href=\"{escape(str(row.get('article_link', '#')))}\" target=\"_blank\">"
+                f"{escape(str(row.get('article_title', '')))}</a>"
+            ),
+            axis=1,
+        )
+        article_columns = ["published_at", "publisher_name", "headline", "sentiment_label", "sentiment_score"]
+        article_frame = display_news.loc[:, article_columns].rename(
+            columns={
+                "published_at": "Published",
+                "publisher_name": "Publisher",
+                "headline": "Headline",
+                "sentiment_label": "Sentiment",
+                "sentiment_score": "Score",
+            }
+        )
+        st.markdown(article_frame.to_html(index=False, escape=False), unsafe_allow_html=True)
 
 
 def _find_holding_from_route(holding_detail_df: pd.DataFrame, route: dict[str, str]) -> pd.Series:
@@ -827,6 +974,7 @@ except Exception as exc:  # noqa: BLE001
     holdings_df = pd.DataFrame()
 else:
     portfolios_error = None
+    holdings_df = _attach_previous_prices(holdings_df)
 
 company_snapshot_df = _load_company_snapshot()
 recommendations_df = _load_recommendations()
