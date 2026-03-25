@@ -319,49 +319,38 @@ def _render_metric_grid(metrics: list[tuple[str, str]]) -> None:
         column.metric(label, value)
 
 
-def _format_price_move(price: object, previous_price: object) -> str:
-    current_numeric = pd.to_numeric(pd.Series([price]), errors="coerce").iloc[0]
-    previous_numeric = pd.to_numeric(pd.Series([previous_price]), errors="coerce").iloc[0]
-    if pd.isna(current_numeric) or pd.isna(previous_numeric):
-        return ""
-    if float(current_numeric) > float(previous_numeric):
-        return "<span class='holding-move holding-move--up' title='Price increased'>&uarr;</span>"
-    if float(current_numeric) < float(previous_numeric):
-        return "<span class='holding-move holding-move--down' title='Price decreased'>&darr;</span>"
-    return "<span class='holding-move holding-move--flat' title='No price change'>&rarr;</span>"
-
-
-def _latest_price_direction(history_df: pd.DataFrame) -> str | None:
-    if history_df.empty or "price" not in history_df.columns:
+def _movement_direction(current_value: object, comparison_value: object) -> str | None:
+    current_numeric = pd.to_numeric(pd.Series([current_value]), errors="coerce").iloc[0]
+    comparison_numeric = pd.to_numeric(pd.Series([comparison_value]), errors="coerce").iloc[0]
+    if pd.isna(current_numeric) or pd.isna(comparison_numeric):
         return None
-    price_history = history_df.dropna(subset=["price"]).sort_values("snapshot_at")
-    if len(price_history) < 2:
-        return None
-    current_price = pd.to_numeric(pd.Series([price_history.iloc[-1]["price"]]), errors="coerce").iloc[0]
-    previous_price = pd.to_numeric(pd.Series([price_history.iloc[-2]["price"]]), errors="coerce").iloc[0]
-    if pd.isna(current_price) or pd.isna(previous_price):
-        return None
-    if float(current_price) > float(previous_price):
+    if float(current_numeric) > float(comparison_numeric):
         return "up"
-    if float(current_price) < float(previous_price):
+    if float(current_numeric) < float(comparison_numeric):
         return "down"
     return "unchanged"
 
 
-def _price_delta_label(direction: str | None) -> str | None:
+def _movement_indicator_html(direction: str | None, title: str | None = None, label: str | None = None) -> str:
     if direction == "up":
-        return "↑"
-    if direction == "down":
-        return "↓"
-    if direction == "unchanged":
-        return "→"
-    return None
+        arrow = "&uarr;"
+        css_class = "holding-move holding-move--up"
+    elif direction == "down":
+        arrow = "&darr;"
+        css_class = "holding-move holding-move--down"
+    elif direction == "unchanged":
+        arrow = "&rarr;"
+        css_class = "holding-move holding-move--flat"
+    else:
+        return ""
+    title_attribute = f' title="{escape(title)}"' if title else ""
+    label_html = f"<span class='holding-move-label'>{escape(label)}</span>" if label else ""
+    return f"<span class='{css_class}'{title_attribute}>{arrow}</span>{label_html}"
 
 
-def _price_delta_color(direction: str | None) -> str:
-    if direction == "unchanged":
-        return "off"
-    return "normal"
+def _format_price_move(price: object, previous_price: object) -> str:
+    direction = _movement_direction(price, previous_price)
+    return _movement_indicator_html(direction, title="Price movement versus previous snapshot")
 
 
 def _render_holding_table(holding_frame: pd.DataFrame) -> None:
@@ -461,7 +450,7 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
     st.markdown(f"<div class='holding-table-wrap'>{html_table}</div>", unsafe_allow_html=True)
 
 
-def _render_holding_history_chart(history_df: pd.DataFrame) -> None:
+def _render_holding_history_chart(history_df: pd.DataFrame, gross_profit_indicator: str = "") -> None:
     st.markdown("##### Profitability And Cost")
     if history_df.empty:
         st.info("No holding history is available yet for this symbol.")
@@ -488,19 +477,57 @@ def _render_holding_history_chart(history_df: pd.DataFrame) -> None:
     )
     chart_df["Snapshot"] = chart_df["Snapshot"].dt.strftime("%Y-%m-%d")
     chart_df = chart_df.set_index("Snapshot")
-    st.line_chart(chart_df[["Market Value", "Total Cost", "Profit / Loss"]], use_container_width=True)
 
     latest_history = history_df.iloc[-1]
     latest_return_pct = pd.to_numeric(
         pd.Series([latest_history.get("gain_loss_pct")]), errors="coerce"
     ).iloc[0]
-    _render_metric_grid(
-        [
-            ("Latest Cost", _format_currency(latest_history.get("total_cost"))),
-            ("Latest Profit / Loss", _format_currency(latest_history.get("gain_loss_value"))),
-            ("Return", _format_percent(latest_return_pct / 100 if pd.notna(latest_return_pct) else None)),
-        ]
+    summary_columns = st.columns(3)
+    summary_columns[0].metric("Latest Cost", _format_currency(latest_history.get("total_cost")))
+    with summary_columns[1]:
+        st.markdown("**Gross Profit**")
+        st.markdown(
+            f"""
+            <style>
+            .holding-history-profit {{
+                align-items: center;
+                display: inline-flex;
+                gap: 0.45rem;
+                margin-top: 0.15rem;
+            }}
+            .holding-history-profit__value {{
+                color: rgba(250, 250, 250, 0.96);
+                font-size: 1.7rem;
+                font-weight: 600;
+                line-height: 1.2;
+            }}
+            .holding-history-profit .holding-move {{
+                font-size: 1.2rem;
+                font-weight: 700;
+                line-height: 1;
+            }}
+            .holding-history-profit .holding-move--up {{
+                color: #38b000;
+            }}
+            .holding-history-profit .holding-move--down {{
+                color: #d62828;
+            }}
+            .holding-history-profit .holding-move--flat {{
+                color: #a0a4ab;
+            }}
+            </style>
+            <div class="holding-history-profit">
+                <span class="holding-history-profit__value">{escape(_format_currency(latest_history.get("gain_loss_value")))}</span>
+                {gross_profit_indicator}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    summary_columns[2].metric(
+        "Margin",
+        _format_percent(latest_return_pct / 100 if pd.notna(latest_return_pct) else None),
     )
+    st.line_chart(chart_df[["Market Value", "Total Cost", "Profit / Loss"]], use_container_width=True)
 
 
 def _render_holding_detail(
@@ -533,26 +560,29 @@ def _render_holding_detail(
     )
 
     market_value = pd.to_numeric(pd.Series([selected_holding.get("market_value")]), errors="coerce").iloc[0]
+    total_cost = pd.to_numeric(pd.Series([selected_holding.get("total_cost")]), errors="coerce").iloc[0]
     portfolio_weight = (
         float(market_value) / float(total_market_value)
         if pd.notna(market_value) and total_market_value > 0
         else 0.0
     )
 
-    price_direction = _latest_price_direction(holding_history if holding_history is not None else pd.DataFrame())
-    price_delta = _price_delta_label(price_direction)
+    gross_profit_direction = _movement_direction(market_value, total_cost)
+    gross_profit_indicator = _movement_indicator_html(
+        gross_profit_direction,
+        title="Compares current market value with total purchase cost",
+        label="Gross P/L vs cost",
+    )
     metric_columns = st.columns(4)
     metric_columns[0].metric("Market Value", _format_currency(selected_holding.get("market_value")))
     metric_columns[1].metric("Portfolio Weight", _format_percent(portfolio_weight))
     metric_columns[2].metric("Quantity", str(selected_holding.get("quantity", "N/A")))
-    metric_columns[3].metric(
-        "Price",
-        _format_currency(selected_holding.get("price")),
-        delta=price_delta,
-        delta_color=_price_delta_color(price_direction),
-    )
+    metric_columns[3].metric("Price", _format_currency(selected_holding.get("price")))
 
-    _render_holding_history_chart(holding_history if holding_history is not None else pd.DataFrame())
+    _render_holding_history_chart(
+        holding_history if holding_history is not None else pd.DataFrame(),
+        gross_profit_indicator=gross_profit_indicator,
+    )
 
     fundamentals_col, recommendation_col = st.columns([1.2, 1])
 
