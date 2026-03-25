@@ -371,7 +371,7 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
         axis=1,
     )
     if "price" in display_frame.columns and "previous_price" in display_frame.columns:
-        display_frame["Movement"] = display_frame.apply(
+        display_frame["Move"] = display_frame.apply(
             lambda row: _format_price_move(row.get("price"), row.get("previous_price")),
             axis=1,
         )
@@ -386,10 +386,10 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
     if "Company / Ticker" in ordered_columns:
         ordered_columns.remove("Company / Ticker")
     ordered_columns.insert(company_index, "Company / Ticker")
-    if "Movement" in ordered_columns and "price" in ordered_columns:
-        ordered_columns.remove("Movement")
+    if "Move" in ordered_columns and "price" in ordered_columns:
+        ordered_columns.remove("Move")
         price_index = ordered_columns.index("price")
-        ordered_columns.insert(price_index + 1, "Movement")
+        ordered_columns.insert(price_index + 1, "Move")
     for column in trailing_metadata_columns:
         if column in ordered_columns:
             ordered_columns.remove(column)
