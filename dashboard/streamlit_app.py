@@ -23,18 +23,179 @@ from personal_portfolios import (
     fetch_portfolio_holdings,
     fetch_portfolio_snapshots,
 )
+from yahoo_symbols import resolve_yahoo_symbol
 
 
 st.set_page_config(page_title="Trading Platform Dashboard", layout="wide")
+
+
+def _inject_styles() -> None:
+    """Inject global typography and colour-palette styles.
+
+    Typography: River Island editorial aesthetic.
+      - Headings → Cormorant Garamond (high-fashion editorial serif)
+      - Body / UI labels → DM Sans (clean geometric sans-serif)
+
+    Palette: River Island brand colours — light theme.
+      --ri-bg          #FFFFFF   pure white (page background)
+      --ri-bg2         #F5F3EE   warm cream (secondary background / panels)
+      --ri-card        #FFFFFF   white (card surfaces)
+      --ri-border      #E2DDD5   warm stone (borders / dividers)
+      --ri-primary     #C41E3A   RI Crimson (primary accent / interactive)
+      --ri-primary-dk  #A01830   deep crimson (hover / pressed)
+      --ri-accent      #B08A5C   warm gold (secondary accent)
+      --ri-text        #1A1A1A   near-black (primary text)
+      --ri-text-muted  #7A7269   warm grey (secondary / caption text)
+      --ri-up          #2D7A50   deep forest green (positive / gain)
+      --ri-down        #C41E3A   RI Crimson (negative / loss)
+      --ri-link        #C41E3A   RI Crimson (hyperlinks)
+    """
+    st.markdown(
+        """
+        <style>
+        /* ── Google Fonts ─────────────────────────────────────── */
+        @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+
+        /* ── River Island palette variables ──────────────────── */
+        :root {
+            --ri-bg:          #FFFFFF;
+            --ri-bg2:         #F5F3EE;
+            --ri-card:        #FFFFFF;
+            --ri-border:      #E2DDD5;
+            --ri-primary:     #C41E3A;
+            --ri-primary-dk:  #A01830;
+            --ri-accent:      #B08A5C;
+            --ri-text:        #1A1A1A;
+            --ri-text-muted:  #7A7269;
+            --ri-up:          #2D7A50;
+            --ri-down:        #C41E3A;
+            --ri-link:        #C41E3A;
+        }
+
+        /* ── Typography base ──────────────────────────────────── */
+        html, body, [class*="css"] {
+            font-family: 'DM Sans', system-ui, sans-serif;
+        }
+
+        /* ── Display headings — River Island editorial serif ──── */
+        h1 {
+            font-family: 'Cormorant Garamond', Georgia, serif !important;
+            font-weight: 600 !important;
+            font-size: 2.5rem !important;
+            letter-spacing: 0.01em !important;
+            color: var(--ri-text) !important;
+        }
+        h2, h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.015em !important;
+            color: var(--ri-text) !important;
+        }
+        /* Section labels — small-caps utility style */
+        h4, h5, h6 {
+            font-family: 'DM Sans', system-ui, sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 0.76rem !important;
+            letter-spacing: 0.09em !important;
+            text-transform: uppercase !important;
+            color: var(--ri-text-muted) !important;
+        }
+
+        /* ── Streamlit metric widget ──────────────────────────── */
+        [data-testid="stMetricLabel"] p,
+        [data-testid="stMetric"] label {
+            font-family: 'DM Sans', sans-serif !important;
+            font-size: 0.72rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.07em !important;
+            text-transform: uppercase !important;
+            color: var(--ri-text-muted) !important;
+        }
+        [data-testid="stMetricValue"] {
+            font-family: 'DM Sans', system-ui, sans-serif !important;
+            font-size: 1.9rem !important;
+            font-weight: 600 !important;
+            color: var(--ri-text) !important;
+        }
+
+        /* ── Buttons ──────────────────────────────────────────── */
+        .stButton > button {
+            background: var(--ri-primary) !important;
+            border: none !important;
+            border-radius: 4px !important;
+            color: #ffffff !important;
+            font-family: 'DM Sans', sans-serif !important;
+            font-size: 0.76rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.09em !important;
+            text-transform: uppercase !important;
+            padding: 0.5rem 1.5rem !important;
+            transition: background 0.18s ease !important;
+        }
+        .stButton > button:hover {
+            background: var(--ri-primary-dk) !important;
+            color: #ffffff !important;
+        }
+
+        /* ── Selectbox label ──────────────────────────────────── */
+        [data-testid="stSelectbox"] label p {
+            font-family: 'DM Sans', sans-serif !important;
+            font-size: 0.72rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.07em !important;
+            text-transform: uppercase !important;
+            color: var(--ri-text-muted) !important;
+        }
+
+        /* ── Info / warning alerts ────────────────────────────── */
+        [data-testid="stAlert"] {
+            border-left: 4px solid var(--ri-primary) !important;
+            background: var(--ri-bg2) !important;
+            border-radius: 6px !important;
+        }
+
+        /* ── Captions ─────────────────────────────────────────── */
+        [data-testid="stCaptionContainer"] p,
+        .stCaption p {
+            font-family: 'DM Sans', sans-serif !important;
+            font-size: 0.76rem !important;
+            color: var(--ri-text-muted) !important;
+        }
+
+        /* ── Dataframe / table widget ─────────────────────────── */
+        [data-testid="stDataFrame"] {
+            border-radius: 8px !important;
+            overflow: hidden !important;
+        }
+
+        /* ── Sidebar (if ever used) ───────────────────────────── */
+        [data-testid="stSidebar"] {
+            background: var(--ri-bg2) !important;
+        }
+
+        /* ── Tabs ─────────────────────────────────────────────── */
+        button[data-baseweb="tab"] {
+            font-family: 'DM Sans', system-ui, sans-serif !important;
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.03em !important;
+        }
+
+        /* ── Horizontal rules ─────────────────────────────────── */
+        hr {
+            border-color: var(--ri-border) !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+_inject_styles()
 
 scores_path = Path("models/trained_models/latest_scores.csv")
 candidates_path = Path("models/trained_models/trade_candidates.csv")
 recommendations_path = Path("models/trained_models/latest_recommendations.csv")
 market_calendar_path = Path("models/trained_models/current_year_market_calendar.csv")
-
-SYMBOL_ALIASES = {
-    "BA.": "BA.L",
-}
 
 HOLDING_DETAIL_QUERY_KEYS = (
     "holding_symbol",
@@ -45,8 +206,12 @@ HOLDING_DETAIL_QUERY_KEYS = (
 
 
 def _normalize_symbol(symbol: object) -> str:
-    normalized = str(symbol or "").strip().upper()
-    return SYMBOL_ALIASES.get(normalized, normalized)
+    return resolve_yahoo_symbol(symbol)
+
+
+def _humanize_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Rename snake_case column names to Title Case for display."""
+    return df.rename(columns=lambda c: str(c).replace("_", " ").title())
 
 
 def _format_currency(value: object) -> str:
@@ -225,25 +390,27 @@ def _attach_previous_prices(holdings: pd.DataFrame) -> pd.DataFrame:
         select distinct on (portfolio_id)
             id,
             portfolio_id,
-            snapshot_at
+            snapshot_at,
+            date(snapshot_at) as snapshot_day
         from app.portfolio_snapshots
         order by portfolio_id, snapshot_at desc, id desc
     ),
-    holdings_with_prev as (
+    prev_day_snapshot as (
+        select distinct on (s.portfolio_id)
+            s.id,
+            s.portfolio_id
+        from app.portfolio_snapshots s
+        join latest_snapshot ls on ls.portfolio_id = s.portfolio_id
+        where date(s.snapshot_at) < ls.snapshot_day
+        order by s.portfolio_id, s.snapshot_at desc, s.id desc
+    ),
+    prev_prices as (
         select
             h.portfolio_id,
-            h.snapshot_id,
-            h.company,
-            h.instrument_name,
-            h.ticker,
-            h.price,
-            lag(h.price) over (
-                partition by h.portfolio_id, upper(coalesce(h.ticker, ''))
-                order by s.snapshot_at asc, s.id asc, h.id asc
-            ) as previous_price
+            upper(coalesce(h.ticker, '')) as ticker_key,
+            h.price as previous_price
         from app.portfolio_holdings h
-        join app.portfolio_snapshots s
-          on s.id = h.snapshot_id
+        join prev_day_snapshot ps on ps.id = h.snapshot_id
     )
     select
         p.name as portfolio_name,
@@ -254,12 +421,15 @@ def _attach_previous_prices(holdings: pd.DataFrame) -> pd.DataFrame:
         h.instrument_name,
         h.ticker,
         h.price,
-        h.previous_price
+        pp.previous_price
     from latest_snapshot ls
     join app.personal_portfolios p
       on p.id = ls.portfolio_id
-    join holdings_with_prev h
+    join app.portfolio_holdings h
       on h.snapshot_id = ls.id
+    left join prev_prices pp
+      on pp.portfolio_id = ls.portfolio_id
+      and pp.ticker_key = upper(coalesce(h.ticker, ''))
     """
     try:
         previous_prices = pd.read_sql(text(query), postgres_engine())
@@ -286,8 +456,8 @@ def _attach_previous_prices(holdings: pd.DataFrame) -> pd.DataFrame:
     return merged
 
 
-@st.cache_data(show_spinner=False)
-def _load_holding_news_sentiment(ticker: str, limit: int = 8) -> pd.DataFrame:
+@st.cache_data(show_spinner=False, ttl=300)
+def _load_holding_news_sentiment(ticker: str, limit: int = 70) -> pd.DataFrame:
     try:
         return load_symbol_news_sentiment(_normalize_symbol(ticker), limit=limit)
     except Exception:
@@ -395,6 +565,7 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
             ordered_columns.remove(column)
             ordered_columns.append(column)
     display_frame = display_frame.loc[:, ordered_columns]
+    display_frame = _humanize_columns(display_frame)
 
     html_table = display_frame.to_html(index=False, escape=False)
     st.markdown(
@@ -402,30 +573,42 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
         <style>
         .holding-table-wrap {
             overflow-x: auto;
-            border: 1px solid rgba(250, 250, 250, 0.08);
-            border-radius: 12px;
+            border: 1px solid #E2DDD5;
+            border-radius: 10px;
         }
         .holding-table-wrap table {
+            background: #FFFFFF;
             border-collapse: collapse;
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 0.87rem;
             width: 100%;
         }
         .holding-table-wrap th,
         .holding-table-wrap td {
-            border-bottom: 1px solid rgba(250, 250, 250, 0.08);
-            padding: 0.65rem 0.75rem;
+            border-bottom: 1px solid #EDE9E2;
+            color: #1A1A1A;
+            padding: 0.65rem 0.9rem;
             text-align: left;
             white-space: nowrap;
         }
         .holding-table-wrap th {
-            background: rgba(250, 250, 250, 0.04);
+            background: #F5F3EE;
+            color: #7A7269;
+            font-size: 0.70rem;
             font-weight: 600;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+        }
+        .holding-table-wrap tr:hover td {
+            background: #FBF9F6;
         }
         .holding-table-wrap a {
-            color: #83b8ff;
-            text-decoration: none;
+            color: #C41E3A;
             font-weight: 600;
+            text-decoration: none;
         }
         .holding-table-wrap a:hover {
+            color: #A01830;
             text-decoration: underline;
         }
         .holding-move {
@@ -434,15 +617,9 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
             font-weight: 700;
             line-height: 1;
         }
-        .holding-move--up {
-            color: #38b000;
-        }
-        .holding-move--down {
-            color: #d62828;
-        }
-        .holding-move--flat {
-            color: #a0a4ab;
-        }
+        .holding-move--up   { color: #2D7A50; }
+        .holding-move--down { color: #C41E3A; }
+        .holding-move--flat { color: #B0A99E; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -496,8 +673,9 @@ def _render_holding_history_chart(history_df: pd.DataFrame, gross_profit_indicat
                 margin-top: 0.15rem;
             }}
             .holding-history-profit__value {{
-                color: rgba(250, 250, 250, 0.96);
-                font-size: 1.7rem;
+                color: #1A1A1A;
+                font-family: 'DM Sans', system-ui, sans-serif;
+                font-size: 1.85rem;
                 font-weight: 600;
                 line-height: 1.2;
             }}
@@ -506,15 +684,9 @@ def _render_holding_history_chart(history_df: pd.DataFrame, gross_profit_indicat
                 font-weight: 700;
                 line-height: 1;
             }}
-            .holding-history-profit .holding-move--up {{
-                color: #38b000;
-            }}
-            .holding-history-profit .holding-move--down {{
-                color: #d62828;
-            }}
-            .holding-history-profit .holding-move--flat {{
-                color: #a0a4ab;
-            }}
+            .holding-history-profit .holding-move--up   {{ color: #2D7A50; }}
+            .holding-history-profit .holding-move--down {{ color: #C41E3A; }}
+            .holding-history-profit .holding-move--flat {{ color: #B0A99E; }}
             </style>
             <div class="holding-history-profit">
                 <span class="holding-history-profit__value">{escape(_format_currency(latest_history.get("gain_loss_value")))}</span>
@@ -540,7 +712,7 @@ def _render_holding_detail(
     detail_symbol = selected_holding["detail_symbol"]
     company_row = pd.Series(dtype="object")
     recommendation_row = pd.Series(dtype="object")
-    news_frame = _load_holding_news_sentiment(detail_symbol)
+    news_frame = _load_holding_news_sentiment(detail_symbol, limit=70)
     news_summary = summarize_news_sentiment(news_frame)
 
     if not company_snapshot.empty:
@@ -553,7 +725,10 @@ def _render_holding_detail(
         if not recommendation_matches.empty:
             recommendation_row = recommendation_matches.iloc[0]
 
-    st.markdown(f"#### Holding Detail: `{detail_symbol}`")
+    st.markdown(
+        f"<h4>Holding Detail: <code style='font-size: 0.92rem; letter-spacing: 0.06em;'>{escape(detail_symbol)}</code></h4>",
+        unsafe_allow_html=True,
+    )
     st.caption(
         f"{selected_holding.get('instrument_name', selected_holding.get('company', detail_symbol))} | "
         f"{selected_holding.get('portfolio_name', '')}"
@@ -671,7 +846,9 @@ def _render_holding_detail(
             .dt.tz_convert("Europe/London")
             .dt.date
         )
-        display_news = display_news.loc[display_news["local_date"].astype(str) == news_summary.as_of_date].copy()
+        cutoff_date = (pd.Timestamp(news_summary.as_of_date) - pd.Timedelta(days=6)).date()
+        display_news = display_news.loc[display_news["local_date"] >= cutoff_date].copy()
+        display_news = display_news.sort_values("published_at", ascending=False)
         display_news["published_at"] = (
             pd.to_datetime(display_news["published_at"], utc=True, errors="coerce")
             .dt.tz_convert("Europe/London")
@@ -793,8 +970,107 @@ def _render_portfolio_detail(
     return pd.DataFrame()
 
 
+def _render_observability() -> None:
+    """Render the observability dashboard: cron logs, DB activity, news sentiment history."""
+    st.subheader("Observability")
+
+    # ── Cron job logs ────────────────────────────────────────────────────────
+    log_dir = ROOT_DIR / "logs"
+    log_files = {
+        "Price Refresh": log_dir / "price_refresh.log",
+        "News Refresh": log_dir / "news_refresh.log",
+    }
+
+    st.markdown("##### Cron Job Logs")
+    log_cols = st.columns(len(log_files))
+    for col, (label, log_path) in zip(log_cols, log_files.items()):
+        with col:
+            st.markdown(f"###### {label}")
+            if not log_path.exists():
+                st.info(f"No log yet — `{log_path.name}` will appear after the first run.")
+            else:
+                lines = log_path.read_text(encoding="utf-8").splitlines()
+                tail = "\n".join(lines[-40:]) if lines else "(empty)"
+                st.code(tail, language=None)
+
+    # ── Database activity ────────────────────────────────────────────────────
+    st.markdown("##### Database Activity")
+    try:
+        engine = postgres_engine()
+        with engine.connect() as conn:
+            # Portfolio snapshots — one row per portfolio, most recent snapshot
+            snapshot_summary = pd.read_sql(text("""
+                select
+                    p.name as portfolio,
+                    p.holder,
+                    p.portfolio_type as type,
+                    max(s.snapshot_at) as latest_snapshot,
+                    count(s.id) as total_snapshots
+                from app.personal_portfolios p
+                left join app.portfolio_snapshots s on s.portfolio_id = p.id
+                group by p.name, p.holder, p.portfolio_type
+                order by latest_snapshot desc nulls last
+            """), conn)
+
+            # News sentiment — one row per symbol
+            news_summary = pd.read_sql(text("""
+                select
+                    symbol,
+                    count(*) as total_articles,
+                    max(published_at) as latest_article,
+                    max(fetched_at) as last_fetched,
+                    count(distinct date(published_at)) as days_with_news
+                from app.holding_news_sentiment
+                group by symbol
+                order by last_fetched desc
+            """), conn)
+
+        obs_col1, obs_col2 = st.columns([1, 1.2])
+        with obs_col1:
+            st.markdown("###### Portfolio Snapshots")
+            if snapshot_summary.empty:
+                st.info("No snapshots found.")
+            else:
+                st.dataframe(_humanize_columns(snapshot_summary), use_container_width=True, hide_index=True)
+
+        with obs_col2:
+            st.markdown("###### News Sentiment Coverage")
+            if news_summary.empty:
+                st.info("No news sentiment records found.")
+            else:
+                st.dataframe(_humanize_columns(news_summary), use_container_width=True, hide_index=True)
+
+    except Exception as exc:  # noqa: BLE001
+        st.warning(f"Could not query database: {exc}")
+
+    # ── Cron schedule summary ────────────────────────────────────────────────
+    st.markdown("##### Scheduled Jobs")
+    st.dataframe(
+        pd.DataFrame([
+            {
+                "Job": "Price Refresh",
+                "Schedule": "16:45 UTC Mon–Fri",
+                "Script": "data_pipeline/load_personal_portfolio.py",
+                "Log": "logs/price_refresh.log",
+            },
+            {
+                "Job": "News Sentiment Refresh",
+                "Schedule": "17:00 UTC Mon–Fri",
+                "Script": "data_pipeline/refresh_holding_news.py",
+                "Log": "logs/news_refresh.log",
+            },
+        ]),
+        use_container_width=True,
+        hide_index=True,
+    )
+
+
 def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str:
     """Render an Outlook-style month calendar with compact event cards and hover details."""
+    today = pd.Timestamp.today()
+    today_day = today.day
+    today_month = today.month
+
     display_frame = frame.copy()
     display_frame["event_date"] = pd.to_datetime(display_frame["event_date"], errors="coerce")
     display_frame = display_frame.dropna(subset=["event_date"]).sort_values(
@@ -822,11 +1098,13 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
     html_parts = [
         """
         <style>
+        /* ── Market calendar — River Island light palette ───── */
         .market-calendar {
-            background: linear-gradient(180deg, #2c233c 0%, #1c1b24 18%, #17181f 100%);
-            border: 1px solid #3c3f4e;
-            border-radius: 18px;
+            background: #F5F3EE;
+            border: 1px solid #E2DDD5;
+            border-radius: 16px;
             display: grid;
+            font-family: 'DM Sans', system-ui, sans-serif;
             grid-template-columns: repeat(7, minmax(0, 1fr));
             gap: 1px;
             margin-top: 0.75rem;
@@ -834,28 +1112,37 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             padding: 1px;
         }
         .market-calendar__header {
-            background: #232325;
-            color: #d4d7de;
-            font-size: 0.84rem;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            min-height: 48px;
-            padding: 0.8rem 0.75rem;
+            background: #EDE9E2;
+            color: #7A7269;
+            font-size: 0.70rem;
+            font-weight: 600;
+            letter-spacing: 0.09em;
+            min-height: 42px;
+            padding: 0.75rem 0.75rem;
             text-align: left;
+            text-transform: uppercase;
         }
         .market-calendar__day {
-            background: linear-gradient(180deg, #222326 0%, #1f2023 100%);
+            background: #FFFFFF;
             min-height: 120px;
             padding: 0.55rem;
             position: relative;
         }
         .market-calendar__day--empty {
-            background: linear-gradient(180deg, #1d1e22 0%, #191a1d 100%);
+            background: #FAF8F4;
+        }
+        .market-calendar__day--today {
+            background: #FDFAF5;
+            border-top: 2px solid #B08A5C;
+        }
+        .market-calendar__day--today .market-calendar__day-number {
+            color: #B08A5C;
         }
         .market-calendar__day-number {
-            color: #f2f4f8;
-            font-size: 1rem;
-            font-weight: 700;
+            color: #1A1A1A;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 1.05rem;
+            font-weight: 600;
             margin-bottom: 0.4rem;
         }
         .market-calendar__events {
@@ -864,11 +1151,10 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             gap: 0.3rem;
         }
         .market-calendar__event {
-            background: linear-gradient(180deg, #bb5a0a 0%, #9e4703 100%);
-            border-left: 5px solid #ff7a1a;
-            border-radius: 7px;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-            color: #fff4eb;
+            background: #C41E3A;
+            border-left: 4px solid #8C0F22;
+            border-radius: 6px;
+            color: #FFFFFF;
             cursor: default;
             padding: 0.42rem 0.58rem;
             position: relative;
@@ -878,29 +1164,30 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             line-height: 1.2;
         }
         .market-calendar__event-date {
-            color: #ffd7b5;
+            color: #FFCCD3;
             font-size: 0.68rem;
-            font-weight: 700;
+            font-weight: 600;
             opacity: 0.96;
         }
         .market-calendar__event-symbol {
+            color: #FFFFFF;
             font-size: 0.82rem;
-            font-weight: 800;
+            font-weight: 700;
             margin-top: 0.12rem;
         }
         .market-calendar__event-type {
-            color: #ffe3cc;
-            font-size: 0.72rem;
-            opacity: 0.88;
+            color: #FFE0E4;
+            font-size: 0.71rem;
+            opacity: 0.9;
             text-transform: capitalize;
         }
         .market-calendar__tooltip {
-            background: #20232b;
-            border-radius: 12px;
+            background: #FFFFFF;
+            border: 1px solid #E2DDD5;
+            border-radius: 10px;
             bottom: calc(100% + 10px);
-            border: 1px solid #464b5d;
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
-            color: #f5f7fb;
+            box-shadow: 0 12px 32px rgba(26,26,26,0.14);
+            color: #1A1A1A;
             left: 0;
             opacity: 0;
             padding: 0.8rem 0.9rem;
@@ -915,7 +1202,7 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
         .market-calendar__tooltip::after {
             border-left: 8px solid transparent;
             border-right: 8px solid transparent;
-            border-top: 8px solid #20232b;
+            border-top: 8px solid #FFFFFF;
             content: "";
             left: 18px;
             position: absolute;
@@ -927,22 +1214,26 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             visibility: visible;
         }
         .market-calendar__tooltip-title {
-            color: #ffffff;
-            font-size: 0.9rem;
-            font-weight: 800;
+            color: #C41E3A;
+            font-size: 0.88rem;
+            font-weight: 700;
             margin-bottom: 0.35rem;
         }
         .market-calendar__tooltip-line {
+            color: #7A7269;
             display: block;
             font-size: 0.77rem;
             line-height: 1.35;
             margin-top: 0.14rem;
         }
+        .market-calendar__tooltip-line strong {
+            color: #1A1A1A;
+        }
         .calendar-empty {
-            background: linear-gradient(180deg, #222326 0%, #1d1e22 100%);
-            border: 1px solid #3c3f4e;
-            border-radius: 12px;
-            color: #d6dae3;
+            background: #F5F3EE;
+            border: 1px solid #E2DDD5;
+            border-radius: 10px;
+            color: #7A7269;
             padding: 1rem;
         }
         </style>
@@ -983,8 +1274,10 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
                     "</div>"
                 )
 
+            is_today = (day == today_day and selected_month == today_month)
+            day_class = "market-calendar__day market-calendar__day--today" if is_today else "market-calendar__day"
             html_parts.append(
-                "<div class='market-calendar__day'>"
+                f"<div class='{day_class}'>"
                 f"<div class='market-calendar__day-number'>{day}</div>"
                 f"<div class='market-calendar__events'>{''.join(event_cards)}</div>"
                 "</div>"
@@ -1012,7 +1305,32 @@ holding_route = _get_holding_route()
 holding_detail_df = _build_holding_detail_frame(holdings_df) if not holdings_df.empty else pd.DataFrame()
 
 if _has_holding_route(holding_route):
-    st.title("Holding Details")
+    st.markdown(
+        """
+        <div style="
+            background: #F2EBE3;
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+            overflow: hidden;
+            border: 1px solid #E4D8CC;
+        ">
+            <div style="background: #C4573A; height: 5px; width: 100%;"></div>
+            <div style="padding: 1.4rem 2rem 1.3rem;">
+                <h1 style="
+                    color: #C4573A;
+                    font-family: 'Barlow', system-ui, sans-serif;
+                    font-size: 2.2rem;
+                    font-weight: 500;
+                    letter-spacing: 0.06em;
+                    line-height: 1.1;
+                    margin: 0;
+                    text-transform: uppercase;
+                ">Holding Details</h1>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     if st.button("Back To Dashboard", type="primary"):
         _clear_query_params()
         st.rerun()
@@ -1053,110 +1371,208 @@ if _has_holding_route(holding_route):
                 st.info("No holding snapshot history is available for this symbol yet.")
             else:
                 display_history = holding_history_df.copy()
-                st.dataframe(display_history, use_container_width=True, hide_index=True)
+                st.dataframe(_humanize_columns(display_history), use_container_width=True, hide_index=True)
 else:
-    st.title("Trading Platform Dashboard")
+    # ── Derive latest snapshot timestamp for the banner badge ──────────
+    _latest_snapshot_label = "—"
+    _latest_snapshot_date = ""
+    _latest_snapshot_time = ""
+    if not snapshots_df.empty and "snapshot_at" in snapshots_df.columns:
+        _ts = pd.to_datetime(snapshots_df["snapshot_at"], utc=True, errors="coerce").max()
+        if pd.notna(_ts):
+            _latest_snapshot_date = _ts.strftime("%d %b %Y")
+            _latest_snapshot_time = _ts.strftime("%H:%M UTC")
 
-    st.subheader("Personal Portfolios")
-    selected_portfolio = pd.Series(dtype="object")
+    _banner_html = """
+        <div style="
+            background: #F2EBE3;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid #E4D8CC;
+        ">
+            <div style="background: #C4573A; height: 5px; width: 100%;"></div>
+            <div style="
+                align-items: flex-end;
+                display: flex;
+                justify-content: space-between;
+                padding: 2rem 2.25rem 1.75rem;
+            ">
+                <div>
+                    <h1 style="
+                        color: #C4573A;
+                        font-family: 'Barlow', system-ui, sans-serif;
+                        font-size: 2.8rem;
+                        font-weight: 500;
+                        letter-spacing: 0.06em;
+                        line-height: 1.1;
+                        margin: 0;
+                        text-transform: uppercase;
+                    ">Personal Trading Platform</h1>
+                    <p style="
+                        color: #7A6E65;
+                        font-family: 'DM Sans', system-ui, sans-serif;
+                        font-size: 0.76rem;
+                        font-weight: 400;
+                        letter-spacing: 0.08em;
+                        margin: 0.85rem 0 0;
+                        text-transform: uppercase;
+                    ">Portfolio analytics &nbsp;·&nbsp; Market intelligence &nbsp;·&nbsp; Recommendations</p>
+                </div>
+                <div style="
+                    border: 1px solid rgba(196,87,58,0.35);
+                    border-radius: 6px;
+                    padding: 0.5rem 1rem;
+                    text-align: right;
+                ">
+                    <p style="
+                        color: #9C8D83;
+                        font-family: 'DM Sans', system-ui, sans-serif;
+                        font-size: 0.66rem;
+                        font-weight: 500;
+                        letter-spacing: 0.08em;
+                        margin: 0 0 0.3rem;
+                        text-transform: uppercase;
+                    ">Latest snapshot</p>
+                    <p style="
+                        color: #C4573A;
+                        font-family: 'DM Sans', system-ui, sans-serif;
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        margin: 0 0 0.1rem;
+                    ">SNAPSHOT_DATE</p>
+                    <p style="
+                        color: #9C8D83;
+                        font-family: 'DM Sans', system-ui, sans-serif;
+                        font-size: 0.72rem;
+                        font-weight: 400;
+                        margin: 0;
+                    ">SNAPSHOT_TIME</p>
+                </div>
+            </div>
+        </div>
+        """
+    st.markdown(
+        _banner_html
+            .replace("SNAPSHOT_DATE", _latest_snapshot_date)
+            .replace("SNAPSHOT_TIME", _latest_snapshot_time),
+        unsafe_allow_html=True,
+    )
 
-    if portfolios_error is not None:
-        st.warning(f"Could not load portfolios from Postgres: {portfolios_error}")
-    elif portfolios_df.empty:
-        st.info("No portfolios yet. Add one with `make add-portfolio`.")
-    else:
-        portfolio_detail_df = _build_portfolio_detail_frame(portfolios_df)
-        portfolio_selection_event = st.dataframe(
-            portfolio_detail_df.drop(columns=["portfolio_label"]),
-            use_container_width=True,
-            hide_index=True,
-            on_select="rerun",
-            selection_mode="single-row",
-            key="personal_portfolios_table",
-        )
-        st.caption("Select a portfolio row to activate its detail view and holdings list below.")
+    tab_portfolio, tab_diary, tab_signals, tab_observability = st.tabs(
+        ["Portfolio", "Diary", "Signals", "Observability"]
+    )
 
-        selected_rows = portfolio_selection_event.selection.rows
-        if selected_rows:
-            selected_portfolio = portfolio_detail_df.iloc[selected_rows[0]]
+    # ── Portfolio tab ────────────────────────────────────────────────────────
+    with tab_portfolio:
+        selected_portfolio = pd.Series(dtype="object")
 
-    st.subheader("Portfolio Holdings")
-    total_market_value = 0.0
-
-    if portfolios_error is not None:
-        st.info("Portfolio holdings are unavailable because portfolio data could not be loaded.")
-    elif holdings_df.empty:
-        st.info("No holdings yet. Import a CSV with `PORTFOLIO_CSV_PATH=... make add-portfolio`.")
-    else:
-        total_market_value = float(
-            pd.to_numeric(holding_detail_df["market_value"], errors="coerce").fillna(0).sum()
-        )
-        _render_holding_table(holding_detail_df)
-        st.caption("Use the company or ticker link to open the dedicated holding detail page.")
-
-    st.subheader("Market Calendar")
-    if market_calendar_path.exists():
-        market_calendar_df = pd.read_csv(market_calendar_path)
-        market_calendar_df["event_date"] = pd.to_datetime(market_calendar_df["event_date"], errors="coerce")
-        available_months = sorted(
-            month
-            for month in market_calendar_df["event_date"].dropna().dt.month.unique().tolist()
-            if month
-        )
-        if not available_months:
-            st.info("Market calendar data exists, but no valid event dates were found.")
+        st.subheader("Personal Portfolios")
+        if portfolios_error is not None:
+            st.warning(f"Could not load portfolios from Postgres: {portfolios_error}")
+        elif portfolios_df.empty:
+            st.info("No portfolios yet. Add one with `make add-portfolio`.")
         else:
-            current_month = pd.Timestamp.today().month
-            default_month = current_month if current_month in available_months else available_months[0]
-            selected_month = st.selectbox(
-                "Month",
-                options=available_months,
-                index=available_months.index(default_month),
-                format_func=lambda month: month_name[month],
-                key="market_calendar_month",
+            portfolio_detail_df = _build_portfolio_detail_frame(portfolios_df)
+            portfolio_selection_event = st.dataframe(
+                _humanize_columns(portfolio_detail_df.drop(columns=["portfolio_label"])),
+                use_container_width=True,
+                hide_index=True,
+                on_select="rerun",
+                selection_mode="single-row",
+                key="personal_portfolios_table",
             )
-            st.markdown(
-                _build_market_calendar_html(market_calendar_df, selected_month),
-                unsafe_allow_html=True,
+            st.caption("Select a portfolio row to activate its detail view and holdings list below.")
+
+            selected_rows = portfolio_selection_event.selection.rows
+            if selected_rows:
+                selected_portfolio = portfolio_detail_df.iloc[selected_rows[0]]
+
+        st.subheader("Portfolio Holdings")
+        total_market_value = 0.0
+
+        if portfolios_error is not None:
+            st.info("Portfolio holdings are unavailable because portfolio data could not be loaded.")
+        elif holdings_df.empty:
+            st.info("No holdings yet. Import a CSV with `PORTFOLIO_CSV_PATH=... make add-portfolio`.")
+        else:
+            total_market_value = float(
+                pd.to_numeric(holding_detail_df["market_value"], errors="coerce").fillna(0).sum()
             )
-    else:
-        st.info("No market calendar yet. Run data_pipeline/ingest_market_calendar.py first.")
+            _render_holding_table(holding_detail_df)
+            st.caption("Use the company or ticker link to open the dedicated holding detail page.")
 
-    st.subheader("Latest Scores / Recommendations / Candidates")
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.markdown("##### Latest Scores")
-        if scores_path.exists():
-            st.dataframe(pd.read_csv(scores_path), use_container_width=True)
+        st.subheader("Snapshots")
+        if portfolios_error is not None:
+            st.info("Snapshots are unavailable because portfolio data could not be loaded.")
+        elif snapshots_df.empty:
+            st.info("No snapshots yet. Import holdings with `PORTFOLIO_CSV_PATH=... make add-portfolio`.")
+        elif not selected_portfolio.empty:
+            filtered_snapshots = snapshots_df.loc[
+                (snapshots_df["portfolio_name"] == selected_portfolio.get("name"))
+                & (snapshots_df["holder"] == selected_portfolio.get("holder"))
+                & (snapshots_df["portfolio_type"] == selected_portfolio.get("portfolio_type"))
+            ]
+            st.dataframe(_humanize_columns(filtered_snapshots), use_container_width=True, hide_index=True)
         else:
-            st.info("No scores yet. Run src/scoring/score_universe.py first.")
+            st.dataframe(_humanize_columns(snapshots_df), use_container_width=True, hide_index=True)
 
-    with col2:
-        st.markdown("##### Recommendations")
-        if recommendations_path.exists():
-            st.dataframe(pd.read_csv(recommendations_path), use_container_width=True)
+    # ── Diary tab ────────────────────────────────────────────────────────────
+    with tab_diary:
+        st.subheader("Market Calendar")
+        if market_calendar_path.exists():
+            market_calendar_df = pd.read_csv(market_calendar_path)
+            market_calendar_df["event_date"] = pd.to_datetime(market_calendar_df["event_date"], errors="coerce")
+            available_months = sorted(
+                month
+                for month in market_calendar_df["event_date"].dropna().dt.month.unique().tolist()
+                if month
+            )
+            if not available_months:
+                st.info("Market calendar data exists, but no valid event dates were found.")
+            else:
+                current_month = pd.Timestamp.today().month
+                default_month = current_month if current_month in available_months else available_months[0]
+                selected_month = st.selectbox(
+                    "Month",
+                    options=available_months,
+                    index=available_months.index(default_month),
+                    format_func=lambda month: month_name[month],
+                    key="market_calendar_month",
+                )
+                st.markdown(
+                    _build_market_calendar_html(market_calendar_df, selected_month),
+                    unsafe_allow_html=True,
+                )
         else:
-            st.info("No recommendations yet. Run src/recommender/generate_recommendations.py first.")
+            st.info("No market calendar yet. Run data_pipeline/ingest_market_calendar.py first.")
 
-    with col3:
-        st.markdown("##### Trade Candidates")
-        if candidates_path.exists():
-            st.dataframe(pd.read_csv(candidates_path), use_container_width=True)
-        else:
-            st.info("No candidates yet. Run src/strategies/generate_trade_candidates.py first.")
+    # ── Signals tab ──────────────────────────────────────────────────────────
+    with tab_signals:
+        st.subheader("Signals")
+        col1, col2, col3 = st.columns(3)
 
-    st.subheader("Snapshots")
-    if portfolios_error is not None:
-        st.info("Snapshots are unavailable because portfolio data could not be loaded.")
-    elif snapshots_df.empty:
-        st.info("No snapshots yet. Import holdings with `PORTFOLIO_CSV_PATH=... make add-portfolio`.")
-    elif not selected_portfolio.empty:
-        filtered_snapshots = snapshots_df.loc[
-            (snapshots_df["portfolio_name"] == selected_portfolio.get("name"))
-            & (snapshots_df["holder"] == selected_portfolio.get("holder"))
-            & (snapshots_df["portfolio_type"] == selected_portfolio.get("portfolio_type"))
-        ]
-        st.dataframe(filtered_snapshots, use_container_width=True, hide_index=True)
-    else:
-        st.dataframe(snapshots_df, use_container_width=True, hide_index=True)
+        with col1:
+            st.markdown("##### Latest Scores")
+            if scores_path.exists():
+                st.dataframe(_humanize_columns(pd.read_csv(scores_path)), use_container_width=True)
+            else:
+                st.info("No scores yet. Run src/scoring/score_universe.py first.")
+
+        with col2:
+            st.markdown("##### Recommendations")
+            if recommendations_path.exists():
+                st.dataframe(_humanize_columns(pd.read_csv(recommendations_path)), use_container_width=True)
+            else:
+                st.info("No recommendations yet. Run src/recommender/generate_recommendations.py first.")
+
+        with col3:
+            st.markdown("##### Trade Candidates")
+            if candidates_path.exists():
+                st.dataframe(_humanize_columns(pd.read_csv(candidates_path)), use_container_width=True)
+            else:
+                st.info("No candidates yet. Run src/strategies/generate_trade_candidates.py first.")
+
+    # ── Observability tab ────────────────────────────────────────────────────
+    with tab_observability:
+        _render_observability()

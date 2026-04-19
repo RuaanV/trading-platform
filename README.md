@@ -123,6 +123,8 @@ src/backtesting/*"]
 - Personal portfolios, snapshots, and holdings are stored in Postgres via [`data_pipeline/personal_portfolios.py`](/Users/ruaan.venter/code/trading-platform/data_pipeline/personal_portfolios.py).
 - The platform supports importing holdings from CSV exports and preserving snapshot history instead of overwriting the latest state.
 - There is a seeded SIPP workflow with price refresh and symbol resolution in [`data_pipeline/load_personal_portfolio.py`](/Users/ruaan.venter/code/trading-platform/data_pipeline/load_personal_portfolio.py).
+- An ISA portfolio loader is scaffolded in [`data_pipeline/load_isa_portfolio.py`](/Users/ruaan.venter/code/trading-platform/data_pipeline/load_isa_portfolio.py) (Hargreaves Lansdown; will activate once the first CSV snapshot is imported via `make add-portfolio`).
+- Daily price refresh for both portfolios is automated via a Cowork scheduled task running weekdays at 16:45. The ISA refresh no-ops gracefully until a snapshot is imported.
 - The dashboard can display portfolios, snapshots, and holdings from Postgres in [`dashboard/streamlit_app.py`](/Users/ruaan.venter/code/trading-platform/dashboard/streamlit_app.py).
 - Holdings in the dashboard now show movement against the previous snapshot directly next to the current `price`, making day-over-day portfolio changes easier to scan.
 

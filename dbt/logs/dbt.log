@@ -1471,3 +1471,510 @@ drop table if exists "trading_platform"."analytics_features"."fct_company_snapsh
 [0m09:38:22.467211 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x125adf830>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x125adfd70>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x125adf770>]}
 [0m09:38:22.467451 [debug] [MainThread]: Flushing usage events
 [0m09:38:23.172840 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m13:03:10.513251 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1060e7620>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x107357890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x107b57d90>]}
+
+
+============================== 13:03:10.517563 | b3297bb2-fd80-453b-9a6f-005bdd5ece6f ==============================
+[0m13:03:10.517563 [info ] [MainThread]: Running with dbt=1.11.7
+[0m13:03:10.518055 [debug] [MainThread]: running dbt with arguments {'debug': 'False', 'invocation_command': 'dbt run --project-dir dbt', 'introspect': 'True', 'fail_fast': 'False', 'write_json': 'True', 'log_path': 'dbt/logs', 'quiet': 'False', 'static_parser': 'True', 'cache_selected_only': 'False', 'no_print': 'None', 'empty': 'False', 'target_path': 'None', 'log_cache_events': 'False', 'send_anonymous_usage_stats': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'warn_error': 'None', 'printer_width': '80', 'profiles_dir': 'dbt', 'log_format': 'default', 'indirect_selection': 'eager', 'use_colors': 'True', 'use_experimental_parser': 'False', 'version_check': 'True', 'partial_parse': 'True'}
+[0m13:03:10.684994 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': 'b3297bb2-fd80-453b-9a6f-005bdd5ece6f', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x106a368b0>]}
+[0m13:03:10.723738 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'adapter_info', 'label': 'b3297bb2-fd80-453b-9a6f-005bdd5ece6f', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1079fe470>]}
+[0m13:03:10.724643 [info ] [MainThread]: Registered adapter: postgres=1.10.0
+[0m13:03:10.796648 [debug] [MainThread]: checksum: b80718358155fc17c3559352095564dd56ada1cc1a1c0ef2e62c857e71583775, vars: {}, profile: , target: , version: 1.11.7
+[0m13:03:10.873952 [debug] [MainThread]: Partial parsing enabled: 0 files deleted, 0 files added, 0 files changed.
+[0m13:03:10.874239 [debug] [MainThread]: Nothing changed, skipping partial parsing.
+[0m13:03:10.874395 [debug] [MainThread]: Partial parsing enabled, no changes found, skipping parsing
+[0m13:03:10.892093 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'load_project', 'label': 'b3297bb2-fd80-453b-9a6f-005bdd5ece6f', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x11155c550>]}
+[0m13:03:10.930574 [debug] [MainThread]: Wrote artifact WritableManifest to dbt/target/manifest.json
+[0m13:03:10.932845 [debug] [MainThread]: Wrote artifact SemanticManifest to dbt/target/semantic_manifest.json
+[0m13:03:10.957135 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'resource_counts', 'label': 'b3297bb2-fd80-453b-9a6f-005bdd5ece6f', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x107c07020>]}
+[0m13:03:10.957537 [info ] [MainThread]: Found 5 models, 4 sources, 464 macros
+[0m13:03:10.957741 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'b3297bb2-fd80-453b-9a6f-005bdd5ece6f', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1115d2270>]}
+[0m13:03:10.959289 [info ] [MainThread]: 
+[0m13:03:10.959595 [info ] [MainThread]: Concurrency: 4 threads (target='dev')
+[0m13:03:10.959861 [info ] [MainThread]: 
+[0m13:03:10.960193 [debug] [MainThread]: Acquiring new postgres connection 'master'
+[0m13:03:10.963031 [debug] [ThreadPool]: Acquiring new postgres connection 'list_trading_platform'
+[0m13:03:10.963469 [debug] [ThreadPool]: Acquiring new postgres connection 'list_trading_platform'
+[0m13:03:11.001840 [debug] [ThreadPool]: Using postgres connection "list_trading_platform"
+[0m13:03:11.002126 [debug] [ThreadPool]: Using postgres connection "list_trading_platform"
+[0m13:03:11.002362 [debug] [ThreadPool]: On list_trading_platform: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "connection_name": "list_trading_platform"} */
+
+    select distinct nspname from pg_namespace
+  
+[0m13:03:11.002550 [debug] [ThreadPool]: On list_trading_platform: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "connection_name": "list_trading_platform"} */
+
+    select distinct nspname from pg_namespace
+  
+[0m13:03:11.002931 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m13:03:11.004456 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m13:03:11.191272 [debug] [ThreadPool]: SQL status: SELECT 6 in 0.187 seconds
+[0m13:03:11.192228 [debug] [ThreadPool]: On list_trading_platform: Close
+[0m13:03:11.209190 [debug] [ThreadPool]: SQL status: SELECT 6 in 0.206 seconds
+[0m13:03:11.210613 [debug] [ThreadPool]: On list_trading_platform: Close
+[0m13:03:11.211474 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_trading_platform, now create_trading_platform_analytics_staging)
+[0m13:03:11.211730 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_trading_platform, now create_trading_platform_analytics_features)
+[0m13:03:11.212290 [debug] [ThreadPool]: Creating schema "database: "trading_platform"
+schema: "analytics_staging"
+"
+[0m13:03:11.212586 [debug] [ThreadPool]: Creating schema "database: "trading_platform"
+schema: "analytics_features"
+"
+[0m13:03:11.216858 [debug] [ThreadPool]: Using postgres connection "create_trading_platform_analytics_staging"
+[0m13:03:11.218136 [debug] [ThreadPool]: Using postgres connection "create_trading_platform_analytics_features"
+[0m13:03:11.218379 [debug] [ThreadPool]: On create_trading_platform_analytics_staging: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "connection_name": "create_trading_platform_analytics_staging"} */
+create schema if not exists "analytics_staging"
+[0m13:03:11.218640 [debug] [ThreadPool]: On create_trading_platform_analytics_features: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "connection_name": "create_trading_platform_analytics_features"} */
+create schema if not exists "analytics_features"
+[0m13:03:11.218852 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m13:03:11.219052 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m13:03:11.239050 [debug] [ThreadPool]: SQL status: CREATE SCHEMA in 0.020 seconds
+[0m13:03:11.239908 [debug] [ThreadPool]: On create_trading_platform_analytics_staging: COMMIT
+[0m13:03:11.240641 [debug] [ThreadPool]: Using postgres connection "create_trading_platform_analytics_staging"
+[0m13:03:11.241443 [debug] [ThreadPool]: On create_trading_platform_analytics_staging: COMMIT
+[0m13:03:11.242334 [debug] [ThreadPool]: SQL status: CREATE SCHEMA in 0.023 seconds
+[0m13:03:11.242573 [debug] [ThreadPool]: SQL status: COMMIT in 0.001 seconds
+[0m13:03:11.243209 [debug] [ThreadPool]: On create_trading_platform_analytics_features: COMMIT
+[0m13:03:11.243460 [debug] [ThreadPool]: On create_trading_platform_analytics_staging: Close
+[0m13:03:11.243694 [debug] [ThreadPool]: Using postgres connection "create_trading_platform_analytics_features"
+[0m13:03:11.243914 [debug] [ThreadPool]: On create_trading_platform_analytics_features: COMMIT
+[0m13:03:11.245007 [debug] [ThreadPool]: SQL status: COMMIT in 0.001 seconds
+[0m13:03:11.245227 [debug] [ThreadPool]: On create_trading_platform_analytics_features: Close
+[0m13:03:11.246390 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly create_trading_platform_analytics_features, now list_trading_platform_analytics_staging)
+[0m13:03:11.246719 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly create_trading_platform_analytics_staging, now list_trading_platform_analytics_features)
+[0m13:03:11.250843 [debug] [ThreadPool]: Using postgres connection "list_trading_platform_analytics_staging"
+[0m13:03:11.253011 [debug] [ThreadPool]: Using postgres connection "list_trading_platform_analytics_features"
+[0m13:03:11.254370 [debug] [ThreadPool]: On list_trading_platform_analytics_staging: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "connection_name": "list_trading_platform_analytics_staging"} */
+select
+      'trading_platform' as database,
+      tablename as name,
+      schemaname as schema,
+      'table' as type
+    from pg_tables
+    where schemaname ilike 'analytics_staging'
+    union all
+    select
+      'trading_platform' as database,
+      viewname as name,
+      schemaname as schema,
+      'view' as type
+    from pg_views
+    where schemaname ilike 'analytics_staging'
+    union all
+    select
+      'trading_platform' as database,
+      matviewname as name,
+      schemaname as schema,
+      'materialized_view' as type
+    from pg_matviews
+    where schemaname ilike 'analytics_staging'
+  
+[0m13:03:11.254692 [debug] [ThreadPool]: On list_trading_platform_analytics_features: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "connection_name": "list_trading_platform_analytics_features"} */
+select
+      'trading_platform' as database,
+      tablename as name,
+      schemaname as schema,
+      'table' as type
+    from pg_tables
+    where schemaname ilike 'analytics_features'
+    union all
+    select
+      'trading_platform' as database,
+      viewname as name,
+      schemaname as schema,
+      'view' as type
+    from pg_views
+    where schemaname ilike 'analytics_features'
+    union all
+    select
+      'trading_platform' as database,
+      matviewname as name,
+      schemaname as schema,
+      'materialized_view' as type
+    from pg_matviews
+    where schemaname ilike 'analytics_features'
+  
+[0m13:03:11.254956 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m13:03:11.255234 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m13:03:11.312827 [debug] [ThreadPool]: SQL status: SELECT 0 in 0.058 seconds
+[0m13:03:11.313210 [debug] [ThreadPool]: SQL status: SELECT 0 in 0.058 seconds
+[0m13:03:11.314039 [debug] [ThreadPool]: On list_trading_platform_analytics_staging: ROLLBACK
+[0m13:03:11.314830 [debug] [ThreadPool]: On list_trading_platform_analytics_features: ROLLBACK
+[0m13:03:11.315915 [debug] [ThreadPool]: On list_trading_platform_analytics_staging: Close
+[0m13:03:11.316210 [debug] [ThreadPool]: On list_trading_platform_analytics_features: Close
+[0m13:03:11.319350 [debug] [MainThread]: Using postgres connection "master"
+[0m13:03:11.319648 [debug] [MainThread]: On master: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "connection_name": "master"} */
+select distinct
+        dependent_namespace.nspname as dependent_schema,
+        dependent_class.relname as dependent_name,
+        referenced_namespace.nspname as referenced_schema,
+        referenced_class.relname as referenced_name
+
+    -- Query for views: views are entries in pg_class with an entry in pg_rewrite, but we avoid
+    -- a seq scan on pg_rewrite by leveraging the fact there is an "internal" row in pg_depend for
+    -- the view...
+    from pg_class as dependent_class
+    join pg_namespace as dependent_namespace on dependent_namespace.oid = dependent_class.relnamespace
+    join pg_depend as dependent_depend on dependent_depend.refobjid = dependent_class.oid
+        and dependent_depend.classid = 'pg_rewrite'::regclass
+        and dependent_depend.refclassid = 'pg_class'::regclass
+        and dependent_depend.deptype = 'i'
+
+    -- ... and via pg_depend (that has a row per column, hence the need for "distinct" above, and
+    -- making sure to exclude the internal row to avoid a view appearing to depend on itself)...
+    join pg_depend as joining_depend on joining_depend.objid = dependent_depend.objid
+        and joining_depend.classid = 'pg_rewrite'::regclass
+        and joining_depend.refclassid = 'pg_class'::regclass
+        and joining_depend.refobjid != dependent_depend.refobjid
+
+    -- ... we can find the tables they query from in pg_class, but excluding system tables. Note we
+    -- don't need need to exclude _dependent_ system tables, because they only query from other
+    -- system tables, and so are automatically excluded by excluding _referenced_ system tables
+    join pg_class as referenced_class on referenced_class.oid = joining_depend.refobjid
+    join pg_namespace as referenced_namespace on referenced_namespace.oid = referenced_class.relnamespace
+        and referenced_namespace.nspname != 'information_schema'
+        and referenced_namespace.nspname not like 'pg\_%'
+
+    order by
+        dependent_schema, dependent_name, referenced_schema, referenced_name;
+[0m13:03:11.319844 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m13:03:11.363705 [debug] [MainThread]: SQL status: SELECT 4 in 0.044 seconds
+[0m13:03:11.364927 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'runnable_timing', 'label': 'b3297bb2-fd80-453b-9a6f-005bdd5ece6f', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x11188f5f0>]}
+[0m13:03:11.365315 [debug] [MainThread]: On master: ROLLBACK
+[0m13:03:11.366792 [debug] [MainThread]: On master: COMMIT
+[0m13:03:11.367165 [debug] [MainThread]: Using postgres connection "master"
+[0m13:03:11.367337 [debug] [MainThread]: On master: COMMIT
+[0m13:03:11.369078 [debug] [MainThread]: SQL status: COMMIT in 0.002 seconds
+[0m13:03:11.369339 [debug] [MainThread]: On master: Close
+[0m13:03:11.372419 [debug] [Thread-1 (]: Began running node model.trading_platform.stg_balance_sheet
+[0m13:03:11.372743 [debug] [Thread-3 (]: Began running node model.trading_platform.stg_institutional_holders
+[0m13:03:11.372961 [debug] [Thread-4 (]: Began running node model.trading_platform.stg_major_holders
+[0m13:03:11.373153 [debug] [Thread-2 (]: Began running node model.trading_platform.stg_company_info
+[0m13:03:11.373446 [info ] [Thread-1 (]: 1 of 5 START sql view model analytics_staging.stg_balance_sheet ................ [RUN]
+[0m13:03:11.373746 [info ] [Thread-3 (]: 3 of 5 START sql view model analytics_staging.stg_institutional_holders ........ [RUN]
+[0m13:03:11.374610 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly list_trading_platform_analytics_staging, now model.trading_platform.stg_balance_sheet)
+[0m13:03:11.373986 [info ] [Thread-4 (]: 4 of 5 START sql view model analytics_staging.stg_major_holders ................ [RUN]
+[0m13:03:11.374272 [info ] [Thread-2 (]: 2 of 5 START sql view model analytics_staging.stg_company_info ................. [RUN]
+[0m13:03:11.375143 [debug] [Thread-3 (]: Acquiring new postgres connection 'model.trading_platform.stg_institutional_holders'
+[0m13:03:11.375392 [debug] [Thread-1 (]: Began compiling node model.trading_platform.stg_balance_sheet
+[0m13:03:11.375638 [debug] [Thread-4 (]: Acquiring new postgres connection 'model.trading_platform.stg_major_holders'
+[0m13:03:11.375845 [debug] [Thread-2 (]: Re-using an available connection from the pool (formerly list_trading_platform_analytics_features, now model.trading_platform.stg_company_info)
+[0m13:03:11.376044 [debug] [Thread-3 (]: Began compiling node model.trading_platform.stg_institutional_holders
+[0m13:03:11.381185 [debug] [Thread-1 (]: Writing injected SQL for node "model.trading_platform.stg_balance_sheet"
+[0m13:03:11.381963 [debug] [Thread-4 (]: Began compiling node model.trading_platform.stg_major_holders
+[0m13:03:11.382272 [debug] [Thread-2 (]: Began compiling node model.trading_platform.stg_company_info
+[0m13:03:11.384028 [debug] [Thread-3 (]: Writing injected SQL for node "model.trading_platform.stg_institutional_holders"
+[0m13:03:11.385825 [debug] [Thread-4 (]: Writing injected SQL for node "model.trading_platform.stg_major_holders"
+[0m13:03:11.387266 [debug] [Thread-2 (]: Writing injected SQL for node "model.trading_platform.stg_company_info"
+[0m13:03:11.388126 [debug] [Thread-1 (]: Began executing node model.trading_platform.stg_balance_sheet
+[0m13:03:11.409385 [debug] [Thread-1 (]: Writing runtime sql for node "model.trading_platform.stg_balance_sheet"
+[0m13:03:11.409826 [debug] [Thread-4 (]: Began executing node model.trading_platform.stg_major_holders
+[0m13:03:11.412924 [debug] [Thread-4 (]: Writing runtime sql for node "model.trading_platform.stg_major_holders"
+[0m13:03:11.413275 [debug] [Thread-3 (]: Began executing node model.trading_platform.stg_institutional_holders
+[0m13:03:11.413675 [debug] [Thread-2 (]: Began executing node model.trading_platform.stg_company_info
+[0m13:03:11.416025 [debug] [Thread-3 (]: Writing runtime sql for node "model.trading_platform.stg_institutional_holders"
+[0m13:03:11.416352 [debug] [Thread-1 (]: Using postgres connection "model.trading_platform.stg_balance_sheet"
+[0m13:03:11.418476 [debug] [Thread-2 (]: Writing runtime sql for node "model.trading_platform.stg_company_info"
+[0m13:03:11.418884 [debug] [Thread-4 (]: Using postgres connection "model.trading_platform.stg_major_holders"
+[0m13:03:11.419161 [debug] [Thread-1 (]: On model.trading_platform.stg_balance_sheet: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_balance_sheet"} */
+
+  create view "trading_platform"."analytics_staging"."stg_balance_sheet__dbt_tmp"
+    
+    
+  as (
+    select
+    symbol,
+    extracted_at::timestamptz as extracted_at,
+    metric,
+    as_of_date::date as as_of_date,
+    value::numeric as value
+from "trading_platform"."raw"."balance_sheet"
+  );
+[0m13:03:11.419630 [debug] [Thread-3 (]: Using postgres connection "model.trading_platform.stg_institutional_holders"
+[0m13:03:11.419859 [debug] [Thread-4 (]: On model.trading_platform.stg_major_holders: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_major_holders"} */
+
+  create view "trading_platform"."analytics_staging"."stg_major_holders__dbt_tmp"
+    
+    
+  as (
+    select
+    symbol,
+    extracted_at::timestamptz as extracted_at,
+    holder_metric,
+    holder_value
+from "trading_platform"."raw"."major_holders"
+  );
+[0m13:03:11.420185 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m13:03:11.420523 [debug] [Thread-2 (]: Using postgres connection "model.trading_platform.stg_company_info"
+[0m13:03:11.420756 [debug] [Thread-3 (]: On model.trading_platform.stg_institutional_holders: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_institutional_holders"} */
+
+  create view "trading_platform"."analytics_staging"."stg_institutional_holders__dbt_tmp"
+    
+    
+  as (
+    select
+    symbol,
+    extracted_at::timestamptz as extracted_at,
+    holder,
+    shares::numeric as shares,
+    coalesce(date_reported::date, null) as date_reported,
+    pct_out::numeric as pct_out,
+    value::numeric as value
+from "trading_platform"."raw"."institutional_holders"
+  );
+[0m13:03:11.420971 [debug] [Thread-4 (]: Opening a new connection, currently in state init
+[0m13:03:11.421278 [debug] [Thread-2 (]: On model.trading_platform.stg_company_info: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_company_info"} */
+
+  create view "trading_platform"."analytics_staging"."stg_company_info__dbt_tmp"
+    
+    
+  as (
+    select
+    symbol,
+    extracted_at::timestamptz as extracted_at,
+    short_name,
+    sector,
+    industry,
+    country,
+    currency,
+    market_cap::numeric as market_cap,
+    enterprise_value::numeric as enterprise_value,
+    trailing_pe::numeric as trailing_pe,
+    forward_pe::numeric as forward_pe,
+    trailing_eps::numeric as trailing_eps,
+    forward_eps::numeric as forward_eps,
+    beta::numeric as beta,
+    return_on_assets::numeric as return_on_assets,
+    return_on_equity::numeric as return_on_equity,
+    total_revenue::numeric as total_revenue,
+    gross_profits::numeric as gross_profits,
+    ebitda::numeric as ebitda,
+    long_business_summary
+from "trading_platform"."raw"."company_info"
+  );
+[0m13:03:11.421540 [debug] [Thread-3 (]: Opening a new connection, currently in state init
+[0m13:03:11.421820 [debug] [Thread-2 (]: Opening a new connection, currently in state closed
+[0m13:03:11.436573 [debug] [Thread-4 (]: SQL status: CREATE VIEW in 0.016 seconds
+[0m13:03:11.436893 [debug] [Thread-3 (]: SQL status: CREATE VIEW in 0.015 seconds
+[0m13:03:11.437129 [debug] [Thread-1 (]: SQL status: CREATE VIEW in 0.017 seconds
+[0m13:03:11.440755 [debug] [Thread-4 (]: Using postgres connection "model.trading_platform.stg_major_holders"
+[0m13:03:11.441034 [debug] [Thread-2 (]: SQL status: CREATE VIEW in 0.019 seconds
+[0m13:03:11.442929 [debug] [Thread-3 (]: Using postgres connection "model.trading_platform.stg_institutional_holders"
+[0m13:03:11.444930 [debug] [Thread-1 (]: Using postgres connection "model.trading_platform.stg_balance_sheet"
+[0m13:03:11.445207 [debug] [Thread-4 (]: On model.trading_platform.stg_major_holders: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_major_holders"} */
+alter table "trading_platform"."analytics_staging"."stg_major_holders__dbt_tmp" rename to "stg_major_holders"
+[0m13:03:11.447221 [debug] [Thread-2 (]: Using postgres connection "model.trading_platform.stg_company_info"
+[0m13:03:11.447510 [debug] [Thread-3 (]: On model.trading_platform.stg_institutional_holders: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_institutional_holders"} */
+alter table "trading_platform"."analytics_staging"."stg_institutional_holders__dbt_tmp" rename to "stg_institutional_holders"
+[0m13:03:11.447756 [debug] [Thread-1 (]: On model.trading_platform.stg_balance_sheet: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_balance_sheet"} */
+alter table "trading_platform"."analytics_staging"."stg_balance_sheet__dbt_tmp" rename to "stg_balance_sheet"
+[0m13:03:11.448137 [debug] [Thread-2 (]: On model.trading_platform.stg_company_info: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_company_info"} */
+alter table "trading_platform"."analytics_staging"."stg_company_info__dbt_tmp" rename to "stg_company_info"
+[0m13:03:11.449523 [debug] [Thread-3 (]: SQL status: ALTER TABLE in 0.001 seconds
+[0m13:03:11.449894 [debug] [Thread-4 (]: SQL status: ALTER TABLE in 0.002 seconds
+[0m13:03:11.450170 [debug] [Thread-2 (]: SQL status: ALTER TABLE in 0.002 seconds
+[0m13:03:11.456693 [debug] [Thread-1 (]: SQL status: ALTER TABLE in 0.008 seconds
+[0m13:03:11.458506 [debug] [Thread-3 (]: On model.trading_platform.stg_institutional_holders: COMMIT
+[0m13:03:11.459418 [debug] [Thread-4 (]: On model.trading_platform.stg_major_holders: COMMIT
+[0m13:03:11.460231 [debug] [Thread-2 (]: On model.trading_platform.stg_company_info: COMMIT
+[0m13:03:11.461002 [debug] [Thread-1 (]: On model.trading_platform.stg_balance_sheet: COMMIT
+[0m13:03:11.461227 [debug] [Thread-3 (]: Using postgres connection "model.trading_platform.stg_institutional_holders"
+[0m13:03:11.461435 [debug] [Thread-4 (]: Using postgres connection "model.trading_platform.stg_major_holders"
+[0m13:03:11.461624 [debug] [Thread-2 (]: Using postgres connection "model.trading_platform.stg_company_info"
+[0m13:03:11.461811 [debug] [Thread-1 (]: Using postgres connection "model.trading_platform.stg_balance_sheet"
+[0m13:03:11.461993 [debug] [Thread-3 (]: On model.trading_platform.stg_institutional_holders: COMMIT
+[0m13:03:11.462162 [debug] [Thread-4 (]: On model.trading_platform.stg_major_holders: COMMIT
+[0m13:03:11.462319 [debug] [Thread-2 (]: On model.trading_platform.stg_company_info: COMMIT
+[0m13:03:11.462476 [debug] [Thread-1 (]: On model.trading_platform.stg_balance_sheet: COMMIT
+[0m13:03:11.463917 [debug] [Thread-3 (]: SQL status: COMMIT in 0.001 seconds
+[0m13:03:11.464213 [debug] [Thread-2 (]: SQL status: COMMIT in 0.001 seconds
+[0m13:03:11.467984 [debug] [Thread-3 (]: Applying DROP to: "trading_platform"."analytics_staging"."stg_institutional_holders__dbt_backup"
+[0m13:03:11.468270 [debug] [Thread-1 (]: SQL status: COMMIT in 0.005 seconds
+[0m13:03:11.468491 [debug] [Thread-4 (]: SQL status: COMMIT in 0.006 seconds
+[0m13:03:11.469766 [debug] [Thread-2 (]: Applying DROP to: "trading_platform"."analytics_staging"."stg_company_info__dbt_backup"
+[0m13:03:11.473069 [debug] [Thread-3 (]: Using postgres connection "model.trading_platform.stg_institutional_holders"
+[0m13:03:11.474515 [debug] [Thread-1 (]: Applying DROP to: "trading_platform"."analytics_staging"."stg_balance_sheet__dbt_backup"
+[0m13:03:11.475577 [debug] [Thread-4 (]: Applying DROP to: "trading_platform"."analytics_staging"."stg_major_holders__dbt_backup"
+[0m13:03:11.476957 [debug] [Thread-2 (]: Using postgres connection "model.trading_platform.stg_company_info"
+[0m13:03:11.477248 [debug] [Thread-3 (]: On model.trading_platform.stg_institutional_holders: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_institutional_holders"} */
+drop view if exists "trading_platform"."analytics_staging"."stg_institutional_holders__dbt_backup" cascade
+[0m13:03:11.477627 [debug] [Thread-1 (]: Using postgres connection "model.trading_platform.stg_balance_sheet"
+[0m13:03:11.477982 [debug] [Thread-4 (]: Using postgres connection "model.trading_platform.stg_major_holders"
+[0m13:03:11.478200 [debug] [Thread-2 (]: On model.trading_platform.stg_company_info: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_company_info"} */
+drop view if exists "trading_platform"."analytics_staging"."stg_company_info__dbt_backup" cascade
+[0m13:03:11.478468 [debug] [Thread-1 (]: On model.trading_platform.stg_balance_sheet: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_balance_sheet"} */
+drop view if exists "trading_platform"."analytics_staging"."stg_balance_sheet__dbt_backup" cascade
+[0m13:03:11.478681 [debug] [Thread-4 (]: On model.trading_platform.stg_major_holders: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.stg_major_holders"} */
+drop view if exists "trading_platform"."analytics_staging"."stg_major_holders__dbt_backup" cascade
+[0m13:03:11.479353 [debug] [Thread-3 (]: SQL status: DROP VIEW in 0.001 seconds
+[0m13:03:11.479649 [debug] [Thread-1 (]: SQL status: DROP VIEW in 0.001 seconds
+[0m13:03:11.481295 [debug] [Thread-3 (]: On model.trading_platform.stg_institutional_holders: Close
+[0m13:03:11.481526 [debug] [Thread-4 (]: SQL status: DROP VIEW in 0.003 seconds
+[0m13:03:11.481757 [debug] [Thread-2 (]: SQL status: DROP VIEW in 0.003 seconds
+[0m13:03:11.482468 [debug] [Thread-1 (]: On model.trading_platform.stg_balance_sheet: Close
+[0m13:03:11.483403 [debug] [Thread-4 (]: On model.trading_platform.stg_major_holders: Close
+[0m13:03:11.484961 [debug] [Thread-2 (]: On model.trading_platform.stg_company_info: Close
+[0m13:03:11.485901 [debug] [Thread-3 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'b3297bb2-fd80-453b-9a6f-005bdd5ece6f', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x111633f50>]}
+[0m13:03:11.486144 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'b3297bb2-fd80-453b-9a6f-005bdd5ece6f', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x111a85230>]}
+[0m13:03:11.486825 [debug] [Thread-4 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'b3297bb2-fd80-453b-9a6f-005bdd5ece6f', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x111b879d0>]}
+[0m13:03:11.486604 [info ] [Thread-3 (]: 3 of 5 OK created sql view model analytics_staging.stg_institutional_holders ... [[32mCREATE VIEW[0m in 0.11s]
+[0m13:03:11.487160 [debug] [Thread-2 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'b3297bb2-fd80-453b-9a6f-005bdd5ece6f', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x106a04af0>]}
+[0m13:03:11.487613 [info ] [Thread-1 (]: 1 of 5 OK created sql view model analytics_staging.stg_balance_sheet ........... [[32mCREATE VIEW[0m in 0.11s]
+[0m13:03:11.488267 [debug] [Thread-3 (]: Finished running node model.trading_platform.stg_institutional_holders
+[0m13:03:11.487987 [info ] [Thread-4 (]: 4 of 5 OK created sql view model analytics_staging.stg_major_holders ........... [[32mCREATE VIEW[0m in 0.11s]
+[0m13:03:11.488715 [info ] [Thread-2 (]: 2 of 5 OK created sql view model analytics_staging.stg_company_info ............ [[32mCREATE VIEW[0m in 0.11s]
+[0m13:03:11.489063 [debug] [Thread-1 (]: Finished running node model.trading_platform.stg_balance_sheet
+[0m13:03:11.489433 [debug] [Thread-4 (]: Finished running node model.trading_platform.stg_major_holders
+[0m13:03:11.489730 [debug] [Thread-2 (]: Finished running node model.trading_platform.stg_company_info
+[0m13:03:11.490345 [debug] [Thread-3 (]: Began running node model.trading_platform.fct_company_snapshot
+[0m13:03:11.490638 [info ] [Thread-3 (]: 5 of 5 START sql table model analytics_features.fct_company_snapshot ........... [RUN]
+[0m13:03:11.490933 [debug] [Thread-3 (]: Re-using an available connection from the pool (formerly model.trading_platform.stg_institutional_holders, now model.trading_platform.fct_company_snapshot)
+[0m13:03:11.491146 [debug] [Thread-3 (]: Began compiling node model.trading_platform.fct_company_snapshot
+[0m13:03:11.492900 [debug] [Thread-3 (]: Writing injected SQL for node "model.trading_platform.fct_company_snapshot"
+[0m13:03:11.493673 [debug] [Thread-3 (]: Began executing node model.trading_platform.fct_company_snapshot
+[0m13:03:11.509017 [debug] [Thread-3 (]: Writing runtime sql for node "model.trading_platform.fct_company_snapshot"
+[0m13:03:11.509969 [debug] [Thread-3 (]: Using postgres connection "model.trading_platform.fct_company_snapshot"
+[0m13:03:11.510263 [debug] [Thread-3 (]: On model.trading_platform.fct_company_snapshot: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.fct_company_snapshot"} */
+
+  
+    
+
+  create  table "trading_platform"."analytics_features"."fct_company_snapshot__dbt_tmp"
+  
+  
+    as
+  
+  (
+    with latest_company as (
+    select
+        symbol,
+        extracted_at,
+        short_name,
+        sector,
+        industry,
+        country,
+        currency,
+        market_cap,
+        enterprise_value,
+        trailing_pe,
+        forward_pe,
+        trailing_eps,
+        forward_eps,
+        beta,
+        return_on_assets,
+        return_on_equity,
+        total_revenue,
+        gross_profits,
+        ebitda,
+        long_business_summary
+    from (
+        select
+            *,
+            row_number() over (partition by symbol order by extracted_at desc) as row_num
+        from "trading_platform"."analytics_staging"."stg_company_info"
+    ) ranked_company
+    where row_num = 1
+),
+latest_balance_sheet as (
+    select
+        symbol,
+        extracted_at,
+        metric,
+        as_of_date,
+        value
+    from (
+        select
+            *,
+            row_number() over (
+                partition by symbol, metric
+                order by extracted_at desc, as_of_date desc
+            ) as row_num
+        from "trading_platform"."analytics_staging"."stg_balance_sheet"
+    ) ranked_balance_sheet
+    where row_num = 1
+),
+balance_rollup as (
+    select
+        symbol,
+        max(case when metric = 'Total Assets' then value end) as total_assets,
+        max(case when metric = 'Total Debt' then value end) as total_debt,
+        max(case when metric = 'Stockholders Equity' then value end) as stockholders_equity,
+        max(case when metric = 'Cash Cash Equivalents And Short Term Investments' then value end)
+            as cash_and_short_term_investments
+    from latest_balance_sheet
+    group by symbol
+)
+select
+    c.symbol,
+    c.extracted_at,
+    c.short_name,
+    c.sector,
+    c.industry,
+    c.country,
+    c.currency,
+    c.market_cap,
+    c.enterprise_value,
+    c.trailing_pe,
+    c.forward_pe,
+    c.trailing_eps,
+    c.forward_eps,
+    c.beta,
+    c.return_on_assets,
+    c.return_on_equity,
+    c.total_revenue,
+    c.gross_profits,
+    c.ebitda,
+    b.total_assets,
+    b.total_debt,
+    b.stockholders_equity,
+    b.cash_and_short_term_investments
+from latest_company c
+left join balance_rollup b
+    on c.symbol = b.symbol
+  );
+  
+[0m13:03:11.510491 [debug] [Thread-3 (]: Opening a new connection, currently in state closed
+[0m13:03:11.536073 [debug] [Thread-3 (]: SQL status: SELECT 20 in 0.026 seconds
+[0m13:03:11.539661 [debug] [Thread-3 (]: Using postgres connection "model.trading_platform.fct_company_snapshot"
+[0m13:03:11.539883 [debug] [Thread-3 (]: On model.trading_platform.fct_company_snapshot: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.fct_company_snapshot"} */
+alter table "trading_platform"."analytics_features"."fct_company_snapshot__dbt_tmp" rename to "fct_company_snapshot"
+[0m13:03:11.540807 [debug] [Thread-3 (]: SQL status: ALTER TABLE in 0.001 seconds
+[0m13:03:11.541768 [debug] [Thread-3 (]: On model.trading_platform.fct_company_snapshot: COMMIT
+[0m13:03:11.541997 [debug] [Thread-3 (]: Using postgres connection "model.trading_platform.fct_company_snapshot"
+[0m13:03:11.542178 [debug] [Thread-3 (]: On model.trading_platform.fct_company_snapshot: COMMIT
+[0m13:03:11.543590 [debug] [Thread-3 (]: SQL status: COMMIT in 0.001 seconds
+[0m13:03:11.640072 [debug] [Thread-3 (]: Applying DROP to: "trading_platform"."analytics_features"."fct_company_snapshot__dbt_backup"
+[0m13:03:11.641999 [debug] [Thread-3 (]: Using postgres connection "model.trading_platform.fct_company_snapshot"
+[0m13:03:11.642246 [debug] [Thread-3 (]: On model.trading_platform.fct_company_snapshot: /* {"app": "dbt", "dbt_version": "1.11.7", "profile_name": "trading_platform", "target_name": "dev", "node_id": "model.trading_platform.fct_company_snapshot"} */
+drop table if exists "trading_platform"."analytics_features"."fct_company_snapshot__dbt_backup" cascade
+[0m13:03:11.644518 [debug] [Thread-3 (]: SQL status: DROP TABLE in 0.002 seconds
+[0m13:03:11.645460 [debug] [Thread-3 (]: On model.trading_platform.fct_company_snapshot: Close
+[0m13:03:11.645814 [debug] [Thread-3 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'b3297bb2-fd80-453b-9a6f-005bdd5ece6f', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x111d1dfd0>]}
+[0m13:03:11.646177 [info ] [Thread-3 (]: 5 of 5 OK created sql table model analytics_features.fct_company_snapshot ...... [[32mSELECT 20[0m in 0.15s]
+[0m13:03:11.646566 [debug] [Thread-3 (]: Finished running node model.trading_platform.fct_company_snapshot
+[0m13:03:11.647488 [debug] [MainThread]: On master: COMMIT
+[0m13:03:11.647710 [debug] [MainThread]: Using postgres connection "master"
+[0m13:03:11.647879 [debug] [MainThread]: On master: COMMIT
+[0m13:03:11.648018 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m13:03:11.659640 [debug] [MainThread]: SQL status: COMMIT in 0.012 seconds
+[0m13:03:11.659998 [debug] [MainThread]: On master: Close
+[0m13:03:11.660344 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m13:03:11.660581 [debug] [MainThread]: Connection 'model.trading_platform.stg_balance_sheet' was properly closed.
+[0m13:03:11.660723 [debug] [MainThread]: Connection 'model.trading_platform.stg_company_info' was properly closed.
+[0m13:03:11.660852 [debug] [MainThread]: Connection 'model.trading_platform.fct_company_snapshot' was properly closed.
+[0m13:03:11.660969 [debug] [MainThread]: Connection 'model.trading_platform.stg_major_holders' was properly closed.
+[0m13:03:11.661174 [info ] [MainThread]: 
+[0m13:03:11.661338 [info ] [MainThread]: Finished running 1 table model, 4 view models in 0 hours 0 minutes and 0.70 seconds (0.70s).
+[0m13:03:11.661922 [debug] [MainThread]: Command end result
+[0m13:03:11.674047 [debug] [MainThread]: Wrote artifact WritableManifest to dbt/target/manifest.json
+[0m13:03:11.675215 [debug] [MainThread]: Wrote artifact SemanticManifest to dbt/target/semantic_manifest.json
+[0m13:03:11.679539 [debug] [MainThread]: Wrote artifact RunExecutionResult to dbt/target/run_results.json
+[0m13:03:11.679892 [info ] [MainThread]: 
+[0m13:03:11.680171 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m13:03:11.680453 [info ] [MainThread]: 
+[0m13:03:11.680633 [info ] [MainThread]: Done. PASS=5 WARN=0 ERROR=0 SKIP=0 NO-OP=0 TOTAL=5
+[0m13:03:11.695527 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 1.2423279, "process_in_blocks": "0", "process_kernel_time": 0.368753, "process_mem_max_rss": "153026560", "process_out_blocks": "0", "process_user_time": 1.996984}
+[0m13:03:11.695894 [debug] [MainThread]: Command `dbt run` succeeded at 13:03:11.695844 after 1.24 seconds
+[0m13:03:11.696120 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x111b03530>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x111b03830>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x111b037d0>]}
+[0m13:03:11.696323 [debug] [MainThread]: Flushing usage events
+[0m13:03:12.363603 [debug] [MainThread]: An error was encountered while trying to flush usage events

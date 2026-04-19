@@ -14,6 +14,8 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.append(str(ROOT_DIR))
 
+from data_pipeline.yahoo_symbols import resolve_yahoo_symbol
+
 SCORES_PATH = Path("models/trained_models/latest_scores.csv")
 CANDIDATES_PATH = Path("models/trained_models/trade_candidates.csv")
 RECOMMENDATIONS_PATH = Path("models/trained_models/latest_recommendations.csv")
@@ -29,14 +31,8 @@ ACTION_PRIORITY = {
     "EXIT": 5,
 }
 
-SYMBOL_ALIASES = {
-    "BA.": "BA.L",
-}
-
-
 def _normalize_symbol(symbol: object) -> str:
-    normalized = str(symbol or "").strip().upper()
-    return SYMBOL_ALIASES.get(normalized, normalized)
+    return resolve_yahoo_symbol(symbol)
 
 
 def _normalize_holdings(holdings: pd.DataFrame) -> pd.DataFrame:

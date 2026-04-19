@@ -34,7 +34,7 @@ def _load_holdings() -> pd.DataFrame:
 
 def _symbol_mapping() -> dict[str, str]:
     try:
-        from data_pipeline.load_personal_portfolio import YAHOO_SYMBOLS
+        from data_pipeline.yahoo_symbols import YAHOO_SYMBOLS
     except ImportError:
         return {}
     return {str(key).upper(): str(value).upper() for key, value in YAHOO_SYMBOLS.items()}

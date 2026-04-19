@@ -11,7 +11,13 @@ from src.agents.base import AgentContext
 from src.agents.holding_news_sentiment import HoldingNewsSentimentAgent
 from src.agents.market_analysis import MarketAnalysisAgent
 from src.agents.registry import build_default_registry
-from data_pipeline.holding_news import SymbolNewsSentiment, score_headline_sentiment, sentiment_label
+from data_pipeline.holding_news import (
+    SymbolNewsSentiment,
+    refresh_symbol_news_sentiment,
+    score_headline_sentiment,
+    sentiment_label,
+)
+from data_pipeline.yahoo_symbols import resolve_yahoo_symbol
 
 
 class MarketAnalysisAgentTest(unittest.TestCase):
@@ -98,6 +104,48 @@ class HoldingNewsSentimentHelpersTest(unittest.TestCase):
         self.assertLess(negative_score, 0.0)
         self.assertEqual(sentiment_label(positive_score), "bullish")
         self.assertEqual(sentiment_label(negative_score), "bearish")
+
+    def test_resolve_yahoo_symbol_maps_london_listings(self) -> None:
+        self.assertEqual(resolve_yahoo_symbol("LLOY"), "LLOY.L")
+        self.assertEqual(resolve_yahoo_symbol("MSFT"), "MSFT")
+
+    @patch("data_pipeline.holding_news.store_symbol_news_sentiment")
+    @patch("data_pipeline.holding_news.fetch_yahoo_finance_headlines")
+    def test_refresh_symbol_news_sentiment_uses_provider_symbol_but_stores_holding_symbol(
+        self,
+        mock_fetch,
+        mock_store,
+    ) -> None:
+        mock_fetch.return_value = pd.DataFrame(
+            [
+                {
+                    "symbol": "LLOY.L",
+                    "article_id": "abc",
+                    "published_at": pd.Timestamp("2026-03-26T08:00:00Z"),
+                    "article_title": "Lloyds updates outlook",
+                    "article_summary": None,
+                    "article_link": "https://example.com/lloyds",
+                    "source_name": "Yahoo Finance",
+                    "publisher_name": "Yahoo Finance",
+                    "sentiment_score": 0.1,
+                    "sentiment_label": "neutral",
+                    "sentiment_version": "headline_lexicon_v1",
+                    "article_payload": {},
+                }
+            ]
+        )
+
+        headlines, summary = refresh_symbol_news_sentiment("LLOY")
+
+        mock_fetch.assert_called_once_with(
+            "LLOY.L",
+            target_date=None,
+            timezone_name="Europe/London",
+        )
+        mock_store.assert_called_once()
+        self.assertEqual(headlines.iloc[0]["symbol"], "LLOY")
+        self.assertIsNotNone(summary)
+        self.assertEqual(summary.symbol, "LLOY")
 
 
 if __name__ == "__main__":

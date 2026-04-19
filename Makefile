@@ -35,6 +35,7 @@ help:
 	@echo "  make init-portfolios    - create the personal portfolios table in Postgres"
 	@echo "  make add-portfolio      - insert a portfolio or import holdings using PORTFOLIO_* env vars"
 	@echo "  make load-personal-portfolio - seed the SIPP portfolio and refresh live Yahoo Finance prices"
+	@echo "  make load-isa-portfolio - refresh the ISA portfolio prices (no-op until first CSV is imported)"
 	@echo "  make add-cash-holding   - append the current cash balance as a portfolio holding"
 	@echo "  make cleanup-portfolio-snapshots - keep only the seed and latest SIPP snapshots"
 	@echo "  make dbt-run            - execute dbt models"
@@ -84,6 +85,9 @@ run-agent: venv
 run-holding-news: venv
 	$(PY) src/agents/run_holding_news_agent.py
 
+refresh-holding-news: venv
+	$(PY) data_pipeline/refresh_holding_news.py
+
 run-history: venv
 	$(PY) src/backtesting/load_price_history.py
 
@@ -115,6 +119,9 @@ add-portfolio: venv
 
 load-personal-portfolio: venv
 	$(PY) data_pipeline/load_personal_portfolio.py
+
+load-isa-portfolio: venv
+	$(PY) data_pipeline/load_isa_portfolio.py
 
 add-cash-holding: venv
 	$(PY) data_pipeline/add_cash_holding.py

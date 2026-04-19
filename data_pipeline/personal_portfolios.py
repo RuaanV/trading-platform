@@ -426,13 +426,19 @@ def _prepare_holdings_frame(frame: pd.DataFrame) -> pd.DataFrame:
     columns = list(frame.columns)
 
     mappings = {
-        "company": ["company", "name", "instrument", "security", "holding", "display_name"],
+        # "stock" covers Hargreaves Lansdown exports which use "Stock" as the company column
+        "company": ["company", "name", "instrument", "security", "holding", "display_name", "stock"],
         "instrument_name": ["instrument_name", "description", "full_name", "security_description"],
+        # "epic" covers Hargreaves Lansdown exports which use "Epic" for the LSE ticker code
         "ticker": ["ticker", "symbol", "epic"],
+        # "units" is already covered; listed explicitly for clarity (HL uses "Units")
         "quantity": ["quantity", "shares", "units"],
         "quantity_label": ["quantity_label", "holding_type", "quantity_type"],
-        "price": ["price", "share_price", "last_price", "current_price"],
+        # HL UK equity prices are in pence ("Price (p)") — divide by 100 when loading if needed
+        "price": ["price", "share_price", "last_price", "current_price", "price_p"],
+        # "value" covers HL "Value (£)" column
         "market_value": ["market_value", "value", "market_val", "current_value"],
+        # "book_cost" covers HL "Book cost (£)" column
         "total_cost": ["total_cost", "cost_basis", "book_cost", "cost", "total_book_cost"],
         "gain_loss_value": ["gain_loss_value", "gain_loss", "profit_loss", "pnl_value"],
         "gain_loss_pct": ["gain_loss_pct", "gain_loss_percent", "return_pct", "profit_loss_pct"],

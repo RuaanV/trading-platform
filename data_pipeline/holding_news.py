@@ -15,8 +15,10 @@ import yfinance as yf
 
 try:
     from .db import postgres_engine
+    from .yahoo_symbols import resolve_yahoo_symbol
 except ImportError:
     from db import postgres_engine
+    from yahoo_symbols import resolve_yahoo_symbol
 
 
 PORTFOLIO_SCHEMA = "app"
@@ -99,6 +101,8 @@ class SymbolNewsSentiment:
     average_sentiment_score: float
     sentiment_label: str
     as_of_date: str
+
+
 def _coerce_datetime(value: object) -> datetime | None:
     if value in (None, "", 0):
         return None
@@ -469,6 +473,15 @@ def refresh_symbol_news_sentiment(
     target_date: date | None = None,
     timezone_name: str = DEFAULT_LOCAL_TIMEZONE,
 ) -> tuple[pd.DataFrame, SymbolNewsSentiment | None]:
-    headlines = fetch_yahoo_finance_headlines(symbol, target_date=target_date, timezone_name=timezone_name)
+    holding_symbol = str(symbol).strip().upper()
+    provider_symbol = resolve_yahoo_symbol(holding_symbol)
+    headlines = fetch_yahoo_finance_headlines(
+        provider_symbol,
+        target_date=target_date,
+        timezone_name=timezone_name,
+    )
+    if not headlines.empty:
+        headlines = headlines.copy()
+        headlines["symbol"] = holding_symbol
     store_symbol_news_sentiment(headlines)
     return headlines, summarize_news_sentiment(headlines, timezone_name=timezone_name)

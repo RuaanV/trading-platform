@@ -16,7 +16,28 @@ try:
 except ImportError:
     from db import postgres_engine
 
-DEFAULT_SYMBOLS = ("AAPL", "AMZN", "GOOG", "MSFT", "BA.L")
+DEFAULT_SYMBOLS = (
+    "AAPL",
+    "AMZN",
+    "GOOG",
+    "MSFT",
+    "NVDA",
+    "RGTI",
+    "ASC.L",
+    "BA.L",
+    "GSK.L",
+    "HLN.L",
+    "ISF.L",
+    "IUKD.L",
+    "LLOY.L",
+    "NWG.L",
+    "VOD.L",
+    "0P0000RU81.L",
+    "0P0001FE43.L",
+    "0P0001GZXO.L",
+    "0P0000W36K.L",
+    "0P0001CBJA.L",
+)
 
 
 def _to_snake_case(name: str) -> str:

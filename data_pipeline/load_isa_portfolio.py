@@ -1,11 +1,57 @@
-"""Load the personal SIPP portfolio and refresh market values from Yahoo Finance."""
+"""Load the personal ISA portfolio and refresh market values from Yahoo Finance.
+
+Broker: Hargreaves Lansdown (HL)
+
+## Importing the first snapshot
+
+When you have a CSV export from HL, import it using the generic add-portfolio target:
+
+    PORTFOLIO_NAME="ISA" \\
+    PORTFOLIO_HOLDER="Ruaan Venter" \\
+    PORTFOLIO_TYPE=ISA \\
+    PORTFOLIO_CSV_PATH=/absolute/path/to/isa_export.csv \\
+    PORTFOLIO_SNAPSHOT_AT=2026-04-16T17:00:00 \\
+    PORTFOLIO_SOURCE_UPDATED_AT=2026-04-16T16:35:00 \\
+    PORTFOLIO_QUOTE_DELAY_NOTE="Delayed by at least 15 minutes" \\
+    PORTFOLIO_SOURCE_NAME="Hargreaves Lansdown" \\
+    make add-portfolio
+
+Once a snapshot is in the database, `make load-isa-portfolio` will refresh prices
+on the standard daily schedule.
+
+## Hargreaves Lansdown CSV notes
+
+HL account exports typically include these columns (normalised names in parentheses):
+  - Stock          → company
+  - Epic           → ticker  (LSE epic code, e.g. "VOD", "LLOY")
+  - Units          → quantity
+  - Price (p)      → price   (NOTE: UK equity prices are in PENCE — divide by 100 for £)
+  - Value (£)      → market_value
+  - Book cost (£)  → total_cost
+  - Gain/loss (£)  → gain_loss_value
+  - Gain/loss (%)  → gain_loss_pct
+
+These column names are handled by the platform's flexible column mapper. If an HL
+export uses different column names, add them to the candidates in
+`personal_portfolios._prepare_holdings_frame`.
+
+## Symbol mapping
+
+After importing the first snapshot, inspect unresolved symbols with:
+
+    SELECT ticker, company, source_row->>'refresh_status'
+    FROM app.latest_portfolio_holdings
+    WHERE portfolio_name = 'ISA';
+
+For any holding that resolves as "carried_forward" or "provider_unavailable",
+add an entry to MANUAL_SYMBOL_OVERRIDES below.
+"""
 
 from __future__ import annotations
 
 import os
 from datetime import datetime
 from decimal import Decimal
-from pathlib import Path
 
 import pandas as pd
 
@@ -20,50 +66,26 @@ from personal_portfolios import (
     add_personal_portfolio,
     ensure_personal_portfolio_tables,
     fetch_portfolio_holdings,
-    fetch_portfolio_snapshots,
-    import_portfolio_holdings_from_csv,
     insert_portfolio_holdings_snapshot,
 )
 from yahoo_symbols import YAHOO_SYMBOLS
 
 
-PORTFOLIO_NAME = "SIPP"
+PORTFOLIO_NAME = "ISA"
 PORTFOLIO_HOLDER = "Ruaan Venter"
-PORTFOLIO_TYPE = "SIPP"
-SEED_CSV_PATH = Path(__file__).resolve().parents[1] / "data" / "personal_portfolios" / "sipp_seed_2026-03-08.csv"
-SEED_SNAPSHOT_AT = datetime.fromisoformat("2026-03-08T15:32:00")
-SEED_SOURCE_UPDATED_AT = datetime.fromisoformat("2026-03-08T15:31:00")
-SEED_QUOTE_DELAY_NOTE = "Delayed by at least 15 minutes"
-SEED_SOURCE_NAME = "Interactive Investor"
-SEED_FX_NOTE = "USD values converted to GBP at indicative FX rate"
+PORTFOLIO_TYPE = "ISA"
 SEARCH_PROVIDERS = ("yahoo", "massive", "finnhub")
-MANUAL_SYMBOL_OVERRIDES = {
-    "Artemis Global Income": {
-        "symbol": "0P0000W36K.L",
-        "provider": "yahoo",
-        "name": "Artemis Global Income I Acc",
-    },
-    "Artemis High Income": {
-        "symbol": "0P0001GZXO.L",
-        "provider": "yahoo",
-        "name": "Artemis High Income I Acc",
-    },
-    "Fundsmith Equity": {
-        "symbol": "0P0000RU81.L",
-        "provider": "yahoo",
-        "name": "Fundsmith Equity I Acc",
-    },
-    "Rathbone Global Opportunities": {
-        "symbol": "0P0001FE43.L",
-        "provider": "yahoo",
-        "name": "Rathbone Global Opportunities Fund S Acc",
-    },
-    "Troy Trojan (Class X)": {
-        "symbol": "0P0001CBJA.L",
-        "provider": "yahoo",
-        "name": "Trojan Fund X Accumulation",
-    },
-}
+
+# Add ISA-specific overrides here once you know which holdings don't resolve
+# automatically. Use the same format as load_personal_portfolio.py.
+# Example:
+#   "Fundsmith Equity": {
+#       "symbol": "0P0000RU81.L",
+#       "provider": "yahoo",
+#       "name": "Fundsmith Equity I Acc",
+#   },
+MANUAL_SYMBOL_OVERRIDES: dict[str, dict[str, object]] = {}
+
 
 def _to_decimal(value: object) -> Decimal:
     return Decimal(str(value))
@@ -122,41 +144,25 @@ def _resolve_symbol_from_apis(company: str, instrument_name: object) -> dict[str
     return None
 
 
-def seed_reference_snapshot() -> tuple[int, int]:
-    snapshots = fetch_portfolio_snapshots()
-    snapshot_times = pd.to_datetime(snapshots["snapshot_at"], utc=True).dt.tz_localize(None)
-    existing_seed = snapshots[
-        (snapshots["portfolio_name"] == PORTFOLIO_NAME)
-        & (snapshots["holder"] == PORTFOLIO_HOLDER)
-        & (snapshots["portfolio_type"] == PORTFOLIO_TYPE)
-        & (snapshot_times == pd.Timestamp(SEED_SNAPSHOT_AT))
-    ]
-    if not existing_seed.empty:
-        return int(existing_seed.iloc[0]["snapshot_id"]), 0
+def refresh_latest_snapshot() -> tuple[int, int] | None:
+    """Refresh ISA portfolio prices from Yahoo Finance.
 
-    return import_portfolio_holdings_from_csv(
-        portfolio_name=PORTFOLIO_NAME,
-        holder=PORTFOLIO_HOLDER,
-        portfolio_type=PORTFOLIO_TYPE,
-        csv_path=str(SEED_CSV_PATH),
-        snapshot_at=SEED_SNAPSHOT_AT,
-        source_updated_at=SEED_SOURCE_UPDATED_AT,
-        quote_delay_note=SEED_QUOTE_DELAY_NOTE,
-        source_name=SEED_SOURCE_NAME,
-        fx_note=SEED_FX_NOTE,
-    )
-
-
-def refresh_latest_snapshot_from_yahoo() -> tuple[int, int]:
+    Returns (snapshot_id, row_count) on success, or None if no holdings
+    exist yet (i.e. no CSV has been imported yet).
+    """
     latest_holdings = fetch_portfolio_holdings()
-    latest_holdings = latest_holdings[
+    isa_holdings = latest_holdings[
         (latest_holdings["portfolio_name"] == PORTFOLIO_NAME)
         & (latest_holdings["holder"] == PORTFOLIO_HOLDER)
         & (latest_holdings["portfolio_type"] == PORTFOLIO_TYPE)
     ].copy()
 
-    if latest_holdings.empty:
-        raise ValueError("No existing holdings found to refresh.")
+    if isa_holdings.empty:
+        print(
+            f"No holdings found for {PORTFOLIO_NAME} ({PORTFOLIO_HOLDER}). "
+            "Import a CSV snapshot first — see the docstring at the top of this file."
+        )
+        return None
 
     portfolio_id = add_personal_portfolio(
         name=PORTFOLIO_NAME,
@@ -169,7 +175,7 @@ def refresh_latest_snapshot_from_yahoo() -> tuple[int, int]:
     selected_provider = _portfolio_price_source()
     refreshed_rows: list[dict[str, object]] = []
 
-    for _, row in latest_holdings.iterrows():
+    for _, row in isa_holdings.iterrows():
         record = {
             "company": row["company"],
             "instrument_name": row["instrument_name"],
@@ -211,7 +217,10 @@ def refresh_latest_snapshot_from_yahoo() -> tuple[int, int]:
 
         if provider_symbol and row["quantity"] is not None:
             try:
-                quote = _try_provider_quote(provider_symbol, selected_provider if ticker else (resolved_by or selected_provider))
+                quote = _try_provider_quote(
+                    provider_symbol,
+                    selected_provider if ticker else (resolved_by or selected_provider),
+                )
                 quote_timestamp = datetime.fromisoformat(quote.as_of)
                 latest_quote_at = max(latest_quote_at, quote_timestamp)
                 gbp_price = convert_quote_to_gbp(quote, usd_to_gbp)
@@ -226,24 +235,22 @@ def refresh_latest_snapshot_from_yahoo() -> tuple[int, int]:
                     else None
                 )
 
-                record.update(
-                    {
-                        "ticker": provider_symbol if not ticker else ticker,
-                        "price": gbp_price.quantize(Decimal("0.000001")),
-                        "market_value": market_value,
-                        "gain_loss_value": gain_loss_value,
-                        "gain_loss_pct": gain_loss_pct,
-                        "as_of_date": quote_timestamp.date(),
-                        "source_row": {
-                            "refresh_status": f"{quote.provider}_updated",
-                            "selected_provider": selected_provider,
-                            "resolved_provider": resolved_by,
-                            "provider_symbol": provider_symbol,
-                            "quote_timestamp": quote_timestamp.isoformat(),
-                            "resolved_symbol": resolved_symbol,
-                        },
-                    }
-                )
+                record.update({
+                    "ticker": provider_symbol if not ticker else ticker,
+                    "price": gbp_price.quantize(Decimal("0.000001")),
+                    "market_value": market_value,
+                    "gain_loss_value": gain_loss_value,
+                    "gain_loss_pct": gain_loss_pct,
+                    "as_of_date": quote_timestamp.date(),
+                    "source_row": {
+                        "refresh_status": f"{quote.provider}_updated",
+                        "selected_provider": selected_provider,
+                        "resolved_provider": resolved_by,
+                        "provider_symbol": provider_symbol,
+                        "quote_timestamp": quote_timestamp.isoformat(),
+                        "resolved_symbol": resolved_symbol,
+                    },
+                })
             except Exception as exc:  # noqa: BLE001
                 record["source_row"] = {
                     "refresh_status": "provider_unavailable",
@@ -271,11 +278,12 @@ def refresh_latest_snapshot_from_yahoo() -> tuple[int, int]:
 
 def main() -> None:
     ensure_personal_portfolio_tables()
-    seed_snapshot_id, seed_rows = seed_reference_snapshot()
-    refresh_snapshot_id, refresh_rows = refresh_latest_snapshot_from_yahoo()
+    result = refresh_latest_snapshot()
+    if result is None:
+        return
+    refresh_snapshot_id, refresh_rows = result
     print(
-        "Loaded personal portfolio snapshots: "
-        f"seed_snapshot_id={seed_snapshot_id} seed_rows={seed_rows} "
+        f"Refreshed ISA portfolio snapshot: "
         f"refresh_snapshot_id={refresh_snapshot_id} refresh_rows={refresh_rows}"
     )
 

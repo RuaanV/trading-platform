@@ -42,6 +42,60 @@ class GenerateRecommendationsTest(unittest.TestCase):
         self.assertEqual(recommendations.iloc[0]["action"], "TRIM")
         self.assertIn("existing weight 100.0%", recommendations.iloc[0]["rationale"])
 
+    def test_fund_name_aliases_match_recommendation_symbols(self) -> None:
+        scores = pd.DataFrame(
+            [
+                {"symbol": "0P0000W36K.L", "score": 0.54},
+                {"symbol": "0P0001CBJA.L", "score": 0.54},
+            ]
+        )
+        candidates = pd.DataFrame(
+            [
+                {"symbol": "0P0000W36K.L", "rank": 1},
+                {"symbol": "0P0001CBJA.L", "rank": 2},
+            ]
+        )
+        holdings = pd.DataFrame(
+            [
+                {
+                    "ticker": "Artemis Global Income",
+                    "market_value": 100.0,
+                    "company": "Artemis Global Income",
+                    "portfolio_name": "SIPP",
+                    "snapshot_at": "2026-04-03T11:10:00+00:00",
+                },
+                {
+                    "ticker": "Troy Trojan (Class X)",
+                    "market_value": 100.0,
+                    "company": "Troy Trojan (Class X)",
+                    "portfolio_name": "SIPP",
+                    "snapshot_at": "2026-04-03T11:10:00+00:00",
+                },
+                {
+                    "ticker": "MSFT",
+                    "market_value": 1000.0,
+                    "company": "MSFT",
+                    "portfolio_name": "SIPP",
+                    "snapshot_at": "2026-04-03T11:10:00+00:00",
+                },
+            ]
+        )
+
+        normalized_holdings = recommender._normalize_holdings(holdings)
+        self.assertIn("0P0000W36K.L", set(normalized_holdings["ticker"]))
+        self.assertIn("0P0001CBJA.L", set(normalized_holdings["ticker"]))
+
+        recommendations = recommender.build_recommendations(
+            scores=scores,
+            candidates=candidates,
+            holdings=normalized_holdings,
+            generated_at="2026-04-03T11:10:00+00:00",
+        )
+
+        actions = dict(zip(recommendations["symbol"], recommendations["action"], strict=False))
+        self.assertEqual(actions["0P0000W36K.L"], "HOLD")
+        self.assertEqual(actions["0P0001CBJA.L"], "HOLD")
+
     def test_fixture_holdings_trim_oversized_mid_conviction_position(self) -> None:
         fixture_path = (
             Path(__file__).resolve().parents[1] / "data" / "fixtures" / "recommender_holdings.csv"
@@ -54,11 +108,55 @@ class GenerateRecommendationsTest(unittest.TestCase):
             recommendations_path = tmpdir_path / "recommendations.csv"
 
             scores_path.write_text(
-                "symbol,score\nMSFT,0.62\nAMZN,0.58\nAAPL,0.57\nBA.L,0.56\nGOOG,0.55\n",
+                (
+                    "symbol,score\n"
+                    "MSFT,0.62\n"
+                    "NVDA,0.61\n"
+                    "AMZN,0.58\n"
+                    "AAPL,0.57\n"
+                    "BA.L,0.56\n"
+                    "GOOG,0.55\n"
+                    "0P0000RU81.L,0.55\n"
+                    "0P0001FE43.L,0.54\n"
+                    "0P0001GZXO.L,0.54\n"
+                    "0P0000W36K.L,0.54\n"
+                    "0P0001CBJA.L,0.54\n"
+                    "IUKD.L,0.54\n"
+                    "ISF.L,0.53\n"
+                    "GSK.L,0.53\n"
+                    "HLN.L,0.53\n"
+                    "LLOY.L,0.52\n"
+                    "NWG.L,0.52\n"
+                    "VOD.L,0.51\n"
+                    "ASC.L,0.48\n"
+                    "RGTI,0.46\n"
+                ),
                 encoding="utf-8",
             )
             candidates_path.write_text(
-                "symbol,side,score,rank\nMSFT,BUY,0.62,1\nAMZN,BUY,0.58,2\nAAPL,BUY,0.57,3\nBA.L,BUY,0.56,4\nGOOG,BUY,0.55,5\n",
+                (
+                    "symbol,side,score,rank\n"
+                    "MSFT,BUY,0.62,1\n"
+                    "NVDA,BUY,0.61,2\n"
+                    "AMZN,BUY,0.58,2\n"
+                    "AAPL,BUY,0.57,3\n"
+                    "BA.L,BUY,0.56,4\n"
+                    "GOOG,BUY,0.55,5\n"
+                    "0P0000RU81.L,BUY,0.55,6\n"
+                    "0P0001FE43.L,BUY,0.54,7\n"
+                    "0P0001GZXO.L,BUY,0.54,8\n"
+                    "0P0000W36K.L,BUY,0.54,9\n"
+                    "0P0001CBJA.L,BUY,0.54,10\n"
+                    "IUKD.L,BUY,0.54,11\n"
+                    "ISF.L,BUY,0.53,12\n"
+                    "GSK.L,BUY,0.53,13\n"
+                    "HLN.L,BUY,0.53,14\n"
+                    "LLOY.L,BUY,0.52,15\n"
+                    "NWG.L,BUY,0.52,16\n"
+                    "VOD.L,BUY,0.51,17\n"
+                    "ASC.L,BUY,0.48,18\n"
+                    "RGTI,BUY,0.46,19\n"
+                ),
                 encoding="utf-8",
             )
 
@@ -82,9 +180,14 @@ class GenerateRecommendationsTest(unittest.TestCase):
                 self.assertEqual(actions["MSFT"], "ADD")
                 self.assertEqual(actions["AMZN"], "HOLD")
                 self.assertEqual(actions["AAPL"], "HOLD")
-                self.assertEqual(actions["BA.L"], "WATCH")
+                self.assertEqual(actions["BA.L"], "HOLD")
                 self.assertEqual(actions["GOOG"], "TRIM")
-                self.assertAlmostEqual(target_weights["BA.L"], 0.02, places=4)
+                self.assertEqual(actions["0P0000RU81.L"], "HOLD")
+                self.assertEqual(actions["0P0001FE43.L"], "HOLD")
+                self.assertEqual(actions["0P0001GZXO.L"], "HOLD")
+                self.assertEqual(actions["0P0000W36K.L"], "HOLD")
+                self.assertEqual(actions["0P0001CBJA.L"], "HOLD")
+                self.assertAlmostEqual(target_weights["BA.L"], 0.0505, places=4)
                 self.assertAlmostEqual(target_weights["AMZN"], 0.08, places=4)
                 self.assertAlmostEqual(target_weights["GOOG"], 0.08, places=4)
             finally:
