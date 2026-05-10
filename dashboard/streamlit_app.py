@@ -23,13 +23,68 @@ from personal_portfolios import (
     fetch_portfolio_holdings,
     fetch_portfolio_snapshots,
 )
+from ui_themes import (
+    get_seed_themes,
+    load_active_ui_theme,
+    ensure_ui_theme_tables,
+    fetch_ui_themes,
+    save_active_ui_theme,
+)
 from yahoo_symbols import resolve_yahoo_symbol
 
 
 st.set_page_config(page_title="Trading Platform Dashboard", layout="wide")
 
 
-def _inject_styles() -> None:
+@st.cache_data(show_spinner=False)
+def _load_theme_catalog() -> list[dict[str, object]]:
+    try:
+        ensure_ui_theme_tables()
+        themes = fetch_ui_themes()
+    except Exception:
+        themes = get_seed_themes()
+    return themes or get_seed_themes()
+
+
+@st.cache_data(show_spinner=False)
+def _load_active_theme() -> dict[str, object]:
+    try:
+        ensure_ui_theme_tables()
+        return load_active_ui_theme()
+    except Exception:
+        return next(theme for theme in get_seed_themes() if theme["name"] == "base")
+
+
+def _render_theme_selector(theme_catalog: list[dict[str, object]], active_theme_name: str) -> dict[str, object]:
+    theme_map = {str(theme["name"]): theme for theme in theme_catalog}
+    if "dashboard_theme_name" not in st.session_state:
+        st.session_state["dashboard_theme_name"] = active_theme_name
+
+    options = list(theme_map)
+    selected_theme_name = st.selectbox(
+        "Seasons",
+        options=options,
+        index=options.index(st.session_state["dashboard_theme_name"])
+        if st.session_state["dashboard_theme_name"] in options
+        else options.index(active_theme_name),
+        format_func=lambda name: str(theme_map[name]["label"]),
+        key="dashboard_theme_name",
+        help="Choose a persisted dashboard colour theme for every tab and detail page.",
+    )
+    if selected_theme_name != active_theme_name:
+        try:
+            save_active_ui_theme(selected_theme_name)
+        except Exception as exc:  # noqa: BLE001
+            st.warning(f"Could not save theme selection to Postgres: {exc}")
+        else:
+            _load_theme_catalog.clear()
+            _load_active_theme.clear()
+            st.rerun()
+
+    return theme_map.get(selected_theme_name, theme_map[active_theme_name])
+
+
+def _inject_styles(theme: dict[str, object]) -> None:
     """Inject global typography and colour-palette styles.
 
     Typography: River Island editorial aesthetic.
@@ -50,76 +105,98 @@ def _inject_styles() -> None:
       --ri-down        #C41E3A   RI Crimson (negative / loss)
       --ri-link        #C41E3A   RI Crimson (hyperlinks)
     """
+    tokens = dict(theme["tokens"])
     st.markdown(
-        """
+        f"""
         <style>
         /* ── Google Fonts ─────────────────────────────────────── */
         @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 
         /* ── River Island palette variables ──────────────────── */
-        :root {
-            --ri-bg:          #FFFFFF;
-            --ri-bg2:         #F5F3EE;
-            --ri-card:        #FFFFFF;
-            --ri-border:      #E2DDD5;
-            --ri-primary:     #C41E3A;
-            --ri-primary-dk:  #A01830;
-            --ri-accent:      #B08A5C;
-            --ri-text:        #1A1A1A;
-            --ri-text-muted:  #7A7269;
-            --ri-up:          #2D7A50;
-            --ri-down:        #C41E3A;
-            --ri-link:        #C41E3A;
-        }
+        :root {{
+            --ri-bg:                {tokens["bg"]};
+            --ri-bg2:               {tokens["bg2"]};
+            --ri-bg-soft:           {tokens["bg_soft"]};
+            --ri-card:              {tokens["card"]};
+            --ri-border:            {tokens["border"]};
+            --ri-primary:           {tokens["primary"]};
+            --ri-primary-dk:        {tokens["primary_dk"]};
+            --ri-accent:            {tokens["accent"]};
+            --ri-text:              {tokens["text"]};
+            --ri-text-muted:        {tokens["text_muted"]};
+            --ri-up:                {tokens["up"]};
+            --ri-down:              {tokens["down"]};
+            --ri-flat:              {tokens["flat"]};
+            --ri-link:              {tokens["link"]};
+            --ri-banner-bg:         {tokens["banner_bg"]};
+            --ri-banner-border:     {tokens["banner_border"]};
+            --ri-banner-top:        {tokens["banner_top"]};
+            --ri-badge-bg:          {tokens["badge_bg"]};
+            --ri-badge-border:      {tokens["badge_border"]};
+            --ri-badge-text:        {tokens["badge_text"]};
+            --ri-badge-muted:       {tokens["badge_muted"]};
+            --ri-table-header-bg:   {tokens["table_header_bg"]};
+            --ri-table-row-hover:   {tokens["table_row_hover"]};
+            --ri-calendar-header:   {tokens["calendar_header_bg"]};
+            --ri-calendar-empty:    {tokens["calendar_empty_bg"]};
+            --ri-event-border:      {tokens["event_border"]};
+            --ri-tooltip-shadow:    {tokens["tooltip_shadow"]};
+        }}
+
+        .stApp, [data-testid="stAppViewContainer"], [data-testid="stMainBlockContainer"] {{
+            background: var(--ri-bg) !important;
+            color: var(--ri-text) !important;
+        }}
 
         /* ── Typography base ──────────────────────────────────── */
-        html, body, [class*="css"] {
+        html, body, [class*="css"] {{
             font-family: 'DM Sans', system-ui, sans-serif;
-        }
+            color: var(--ri-text);
+        }}
 
         /* ── Display headings — River Island editorial serif ──── */
-        h1 {
+        h1 {{
             font-family: 'Cormorant Garamond', Georgia, serif !important;
             font-weight: 600 !important;
             font-size: 2.5rem !important;
             letter-spacing: 0.01em !important;
             color: var(--ri-text) !important;
-        }
-        h2, h3 {
+        }}
+        h2, h3 {{
             font-family: 'Cormorant Garamond', Georgia, serif !important;
             font-weight: 600 !important;
             letter-spacing: 0.015em !important;
             color: var(--ri-text) !important;
-        }
+        }}
         /* Section labels — small-caps utility style */
-        h4, h5, h6 {
+        h4, h5, h6 {{
             font-family: 'DM Sans', system-ui, sans-serif !important;
             font-weight: 600 !important;
             font-size: 0.76rem !important;
             letter-spacing: 0.09em !important;
             text-transform: uppercase !important;
             color: var(--ri-text-muted) !important;
-        }
+        }}
 
         /* ── Streamlit metric widget ──────────────────────────── */
         [data-testid="stMetricLabel"] p,
-        [data-testid="stMetric"] label {
+        [data-testid="stMetric"] label {{
             font-family: 'DM Sans', sans-serif !important;
             font-size: 0.72rem !important;
             font-weight: 500 !important;
             letter-spacing: 0.07em !important;
             text-transform: uppercase !important;
             color: var(--ri-text-muted) !important;
-        }
-        [data-testid="stMetricValue"] {
+        }}
+        [data-testid="stMetricValue"] {{
             font-family: 'DM Sans', system-ui, sans-serif !important;
             font-size: 1.9rem !important;
             font-weight: 600 !important;
             color: var(--ri-text) !important;
-        }
+        }}
 
         /* ── Buttons ──────────────────────────────────────────── */
-        .stButton > button {
+        .stButton > button {{
             background: var(--ri-primary) !important;
             border: none !important;
             border-radius: 4px !important;
@@ -131,66 +208,149 @@ def _inject_styles() -> None:
             text-transform: uppercase !important;
             padding: 0.5rem 1.5rem !important;
             transition: background 0.18s ease !important;
-        }
-        .stButton > button:hover {
+        }}
+        .stButton > button:hover {{
             background: var(--ri-primary-dk) !important;
             color: #ffffff !important;
-        }
+        }}
 
         /* ── Selectbox label ──────────────────────────────────── */
-        [data-testid="stSelectbox"] label p {
+        [data-testid="stSelectbox"] label p {{
             font-family: 'DM Sans', sans-serif !important;
             font-size: 0.72rem !important;
             font-weight: 500 !important;
             letter-spacing: 0.07em !important;
             text-transform: uppercase !important;
             color: var(--ri-text-muted) !important;
-        }
+        }}
+        [data-testid="stSelectbox"] > div[data-baseweb="select"] > div {{
+            background: var(--ri-card) !important;
+            border-color: var(--ri-border) !important;
+            color: var(--ri-text) !important;
+        }}
 
         /* ── Info / warning alerts ────────────────────────────── */
-        [data-testid="stAlert"] {
+        [data-testid="stAlert"] {{
             border-left: 4px solid var(--ri-primary) !important;
             background: var(--ri-bg2) !important;
             border-radius: 6px !important;
-        }
+        }}
 
         /* ── Captions ─────────────────────────────────────────── */
         [data-testid="stCaptionContainer"] p,
-        .stCaption p {
+        .stCaption p {{
             font-family: 'DM Sans', sans-serif !important;
             font-size: 0.76rem !important;
             color: var(--ri-text-muted) !important;
-        }
+        }}
 
         /* ── Dataframe / table widget ─────────────────────────── */
-        [data-testid="stDataFrame"] {
+        [data-testid="stDataFrame"] {{
             border-radius: 8px !important;
             overflow: hidden !important;
-        }
+        }}
 
         /* ── Sidebar (if ever used) ───────────────────────────── */
-        [data-testid="stSidebar"] {
+        [data-testid="stSidebar"] {{
             background: var(--ri-bg2) !important;
-        }
+        }}
 
         /* ── Tabs ─────────────────────────────────────────────── */
-        button[data-baseweb="tab"] {
+        button[data-baseweb="tab"] {{
             font-family: 'DM Sans', system-ui, sans-serif !important;
             font-size: 0.9rem !important;
             font-weight: 500 !important;
             letter-spacing: 0.03em !important;
-        }
+            color: var(--ri-text) !important;
+        }}
 
         /* ── Horizontal rules ─────────────────────────────────── */
-        hr {
+        hr {{
             border-color: var(--ri-border) !important;
-        }
+        }}
+
+        .tp-hero {{
+            background: var(--ri-banner-bg);
+            border: 1px solid var(--ri-banner-border);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }}
+        .tp-hero__top {{
+            background: var(--ri-banner-top);
+            height: 5px;
+            width: 100%;
+        }}
+        .tp-hero__body {{
+            align-items: flex-end;
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 2.25rem 1.75rem;
+        }}
+        .tp-hero__body--detail {{
+            display: block;
+            padding: 1.4rem 2rem 1.3rem;
+        }}
+        .tp-hero__title {{
+            color: var(--ri-badge-text);
+            font-family: 'Barlow', system-ui, sans-serif !important;
+            font-size: 2.8rem !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.06em !important;
+            line-height: 1.1 !important;
+            margin: 0 !important;
+            text-transform: uppercase !important;
+        }}
+        .tp-hero__title--detail {{
+            font-size: 2.2rem !important;
+        }}
+        .tp-hero__subtitle {{
+            color: var(--ri-badge-muted);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 0.76rem;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            margin: 0.85rem 0 0;
+            text-transform: uppercase;
+        }}
+        .tp-hero__badge {{
+            background: var(--ri-badge-bg);
+            border: 1px solid var(--ri-badge-border);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            text-align: right;
+        }}
+        .tp-hero__badge-label {{
+            color: var(--ri-badge-muted);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 0.66rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            margin: 0 0 0.3rem;
+            text-transform: uppercase;
+        }}
+        .tp-hero__badge-date {{
+            color: var(--ri-badge-text);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0 0 0.1rem;
+        }}
+        .tp-hero__badge-time {{
+            color: var(--ri-badge-muted);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 0.72rem;
+            font-weight: 400;
+            margin: 0;
+        }}
         </style>
         """,
         unsafe_allow_html=True,
     )
 
-_inject_styles()
+theme_catalog = _load_theme_catalog()
+active_theme = _load_active_theme()
+_inject_styles(active_theme)
 
 scores_path = Path("models/trained_models/latest_scores.csv")
 candidates_path = Path("models/trained_models/trade_candidates.csv")
@@ -354,7 +514,7 @@ def _load_holding_history(
       and p.holder = :holder
       and p.portfolio_type = :portfolio_type
       and upper(coalesce(h.ticker, '')) = :ticker
-    order by s.snapshot_at asc, h.id asc
+    order by s.snapshot_at desc, h.id desc
     """
     try:
         history = pd.read_sql(
@@ -573,11 +733,11 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
         <style>
         .holding-table-wrap {
             overflow-x: auto;
-            border: 1px solid #E2DDD5;
+            border: 1px solid var(--ri-border);
             border-radius: 10px;
         }
         .holding-table-wrap table {
-            background: #FFFFFF;
+            background: var(--ri-card);
             border-collapse: collapse;
             font-family: 'DM Sans', system-ui, sans-serif;
             font-size: 0.87rem;
@@ -585,30 +745,30 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
         }
         .holding-table-wrap th,
         .holding-table-wrap td {
-            border-bottom: 1px solid #EDE9E2;
-            color: #1A1A1A;
+            border-bottom: 1px solid var(--ri-border);
+            color: var(--ri-text);
             padding: 0.65rem 0.9rem;
             text-align: left;
             white-space: nowrap;
         }
         .holding-table-wrap th {
-            background: #F5F3EE;
-            color: #7A7269;
+            background: var(--ri-table-header-bg);
+            color: var(--ri-text-muted);
             font-size: 0.70rem;
             font-weight: 600;
             letter-spacing: 0.09em;
             text-transform: uppercase;
         }
         .holding-table-wrap tr:hover td {
-            background: #FBF9F6;
+            background: var(--ri-table-row-hover);
         }
         .holding-table-wrap a {
-            color: #C41E3A;
+            color: var(--ri-link);
             font-weight: 600;
             text-decoration: none;
         }
         .holding-table-wrap a:hover {
-            color: #A01830;
+            color: var(--ri-primary-dk);
             text-decoration: underline;
         }
         .holding-move {
@@ -617,9 +777,9 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
             font-weight: 700;
             line-height: 1;
         }
-        .holding-move--up   { color: #2D7A50; }
-        .holding-move--down { color: #C41E3A; }
-        .holding-move--flat { color: #B0A99E; }
+        .holding-move--up   { color: var(--ri-up); }
+        .holding-move--down { color: var(--ri-down); }
+        .holding-move--flat { color: var(--ri-flat); }
         </style>
         """,
         unsafe_allow_html=True,
@@ -655,7 +815,7 @@ def _render_holding_history_chart(history_df: pd.DataFrame, gross_profit_indicat
     chart_df["Snapshot"] = chart_df["Snapshot"].dt.strftime("%Y-%m-%d")
     chart_df = chart_df.set_index("Snapshot")
 
-    latest_history = history_df.iloc[-1]
+    latest_history = history_df.iloc[0]
     latest_return_pct = pd.to_numeric(
         pd.Series([latest_history.get("gain_loss_pct")]), errors="coerce"
     ).iloc[0]
@@ -673,7 +833,7 @@ def _render_holding_history_chart(history_df: pd.DataFrame, gross_profit_indicat
                 margin-top: 0.15rem;
             }}
             .holding-history-profit__value {{
-                color: #1A1A1A;
+                color: var(--ri-text);
                 font-family: 'DM Sans', system-ui, sans-serif;
                 font-size: 1.85rem;
                 font-weight: 600;
@@ -684,9 +844,9 @@ def _render_holding_history_chart(history_df: pd.DataFrame, gross_profit_indicat
                 font-weight: 700;
                 line-height: 1;
             }}
-            .holding-history-profit .holding-move--up   {{ color: #2D7A50; }}
-            .holding-history-profit .holding-move--down {{ color: #C41E3A; }}
-            .holding-history-profit .holding-move--flat {{ color: #B0A99E; }}
+            .holding-history-profit .holding-move--up   {{ color: var(--ri-up); }}
+            .holding-history-profit .holding-move--down {{ color: var(--ri-down); }}
+            .holding-history-profit .holding-move--flat {{ color: var(--ri-flat); }}
             </style>
             <div class="holding-history-profit">
                 <span class="holding-history-profit__value">{escape(_format_currency(latest_history.get("gain_loss_value")))}</span>
@@ -1012,33 +1172,11 @@ def _render_observability() -> None:
                 order by latest_snapshot desc nulls last
             """), conn)
 
-            # News sentiment — one row per symbol
-            news_summary = pd.read_sql(text("""
-                select
-                    symbol,
-                    count(*) as total_articles,
-                    max(published_at) as latest_article,
-                    max(fetched_at) as last_fetched,
-                    count(distinct date(published_at)) as days_with_news
-                from app.holding_news_sentiment
-                group by symbol
-                order by last_fetched desc
-            """), conn)
-
-        obs_col1, obs_col2 = st.columns([1, 1.2])
-        with obs_col1:
-            st.markdown("###### Portfolio Snapshots")
-            if snapshot_summary.empty:
-                st.info("No snapshots found.")
-            else:
-                st.dataframe(_humanize_columns(snapshot_summary), use_container_width=True, hide_index=True)
-
-        with obs_col2:
-            st.markdown("###### News Sentiment Coverage")
-            if news_summary.empty:
-                st.info("No news sentiment records found.")
-            else:
-                st.dataframe(_humanize_columns(news_summary), use_container_width=True, hide_index=True)
+        st.markdown("###### Portfolio Snapshots")
+        if snapshot_summary.empty:
+            st.info("No snapshots found.")
+        else:
+            st.dataframe(_humanize_columns(snapshot_summary), use_container_width=True, hide_index=True)
 
     except Exception as exc:  # noqa: BLE001
         st.warning(f"Could not query database: {exc}")
@@ -1100,8 +1238,8 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
         <style>
         /* ── Market calendar — River Island light palette ───── */
         .market-calendar {
-            background: #F5F3EE;
-            border: 1px solid #E2DDD5;
+            background: var(--ri-bg2);
+            border: 1px solid var(--ri-border);
             border-radius: 16px;
             display: grid;
             font-family: 'DM Sans', system-ui, sans-serif;
@@ -1112,8 +1250,8 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             padding: 1px;
         }
         .market-calendar__header {
-            background: #EDE9E2;
-            color: #7A7269;
+            background: var(--ri-calendar-header);
+            color: var(--ri-text-muted);
             font-size: 0.70rem;
             font-weight: 600;
             letter-spacing: 0.09em;
@@ -1123,23 +1261,23 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             text-transform: uppercase;
         }
         .market-calendar__day {
-            background: #FFFFFF;
+            background: var(--ri-card);
             min-height: 120px;
             padding: 0.55rem;
             position: relative;
         }
         .market-calendar__day--empty {
-            background: #FAF8F4;
+            background: var(--ri-calendar-empty);
         }
         .market-calendar__day--today {
-            background: #FDFAF5;
-            border-top: 2px solid #B08A5C;
+            background: var(--ri-bg-soft);
+            border-top: 2px solid var(--ri-accent);
         }
         .market-calendar__day--today .market-calendar__day-number {
-            color: #B08A5C;
+            color: var(--ri-accent);
         }
         .market-calendar__day-number {
-            color: #1A1A1A;
+            color: var(--ri-text);
             font-family: 'Cormorant Garamond', Georgia, serif;
             font-size: 1.05rem;
             font-weight: 600;
@@ -1151,8 +1289,8 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             gap: 0.3rem;
         }
         .market-calendar__event {
-            background: #C41E3A;
-            border-left: 4px solid #8C0F22;
+            background: var(--ri-primary);
+            border-left: 4px solid var(--ri-event-border);
             border-radius: 6px;
             color: #FFFFFF;
             cursor: default;
@@ -1164,7 +1302,7 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             line-height: 1.2;
         }
         .market-calendar__event-date {
-            color: #FFCCD3;
+            color: rgba(255, 255, 255, 0.82);
             font-size: 0.68rem;
             font-weight: 600;
             opacity: 0.96;
@@ -1176,18 +1314,18 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             margin-top: 0.12rem;
         }
         .market-calendar__event-type {
-            color: #FFE0E4;
+            color: rgba(255, 255, 255, 0.86);
             font-size: 0.71rem;
             opacity: 0.9;
             text-transform: capitalize;
         }
         .market-calendar__tooltip {
-            background: #FFFFFF;
-            border: 1px solid #E2DDD5;
+            background: var(--ri-card);
+            border: 1px solid var(--ri-border);
             border-radius: 10px;
             bottom: calc(100% + 10px);
-            box-shadow: 0 12px 32px rgba(26,26,26,0.14);
-            color: #1A1A1A;
+            box-shadow: 0 12px 32px var(--ri-tooltip-shadow);
+            color: var(--ri-text);
             left: 0;
             opacity: 0;
             padding: 0.8rem 0.9rem;
@@ -1202,7 +1340,7 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
         .market-calendar__tooltip::after {
             border-left: 8px solid transparent;
             border-right: 8px solid transparent;
-            border-top: 8px solid #FFFFFF;
+            border-top: 8px solid var(--ri-card);
             content: "";
             left: 18px;
             position: absolute;
@@ -1214,26 +1352,26 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             visibility: visible;
         }
         .market-calendar__tooltip-title {
-            color: #C41E3A;
+            color: var(--ri-primary);
             font-size: 0.88rem;
             font-weight: 700;
             margin-bottom: 0.35rem;
         }
         .market-calendar__tooltip-line {
-            color: #7A7269;
+            color: var(--ri-text-muted);
             display: block;
             font-size: 0.77rem;
             line-height: 1.35;
             margin-top: 0.14rem;
         }
         .market-calendar__tooltip-line strong {
-            color: #1A1A1A;
+            color: var(--ri-text);
         }
         .calendar-empty {
-            background: #F5F3EE;
-            border: 1px solid #E2DDD5;
+            background: var(--ri-bg2);
+            border: 1px solid var(--ri-border);
             border-radius: 10px;
-            color: #7A7269;
+            color: var(--ri-text-muted);
             padding: 1rem;
         }
         </style>
@@ -1307,25 +1445,10 @@ holding_detail_df = _build_holding_detail_frame(holdings_df) if not holdings_df.
 if _has_holding_route(holding_route):
     st.markdown(
         """
-        <div style="
-            background: #F2EBE3;
-            border-radius: 12px;
-            margin-bottom: 1.25rem;
-            overflow: hidden;
-            border: 1px solid #E4D8CC;
-        ">
-            <div style="background: #C4573A; height: 5px; width: 100%;"></div>
-            <div style="padding: 1.4rem 2rem 1.3rem;">
-                <h1 style="
-                    color: #C4573A;
-                    font-family: 'Barlow', system-ui, sans-serif;
-                    font-size: 2.2rem;
-                    font-weight: 500;
-                    letter-spacing: 0.06em;
-                    line-height: 1.1;
-                    margin: 0;
-                    text-transform: uppercase;
-                ">Holding Details</h1>
+        <div class="tp-hero" style="margin-bottom: 1.25rem;">
+            <div class="tp-hero__top"></div>
+            <div class="tp-hero__body tp-hero__body--detail">
+                <h1 class="tp-hero__title tp-hero__title--detail">Holding Details</h1>
             </div>
         </div>
         """,
@@ -1384,70 +1507,17 @@ else:
             _latest_snapshot_time = _ts.strftime("%H:%M UTC")
 
     _banner_html = """
-        <div style="
-            background: #F2EBE3;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            overflow: hidden;
-            border: 1px solid #E4D8CC;
-        ">
-            <div style="background: #C4573A; height: 5px; width: 100%;"></div>
-            <div style="
-                align-items: flex-end;
-                display: flex;
-                justify-content: space-between;
-                padding: 2rem 2.25rem 1.75rem;
-            ">
+        <div class="tp-hero">
+            <div class="tp-hero__top"></div>
+            <div class="tp-hero__body">
                 <div>
-                    <h1 style="
-                        color: #C4573A;
-                        font-family: 'Barlow', system-ui, sans-serif;
-                        font-size: 2.8rem;
-                        font-weight: 500;
-                        letter-spacing: 0.06em;
-                        line-height: 1.1;
-                        margin: 0;
-                        text-transform: uppercase;
-                    ">Personal Trading Platform</h1>
-                    <p style="
-                        color: #7A6E65;
-                        font-family: 'DM Sans', system-ui, sans-serif;
-                        font-size: 0.76rem;
-                        font-weight: 400;
-                        letter-spacing: 0.08em;
-                        margin: 0.85rem 0 0;
-                        text-transform: uppercase;
-                    ">Portfolio analytics &nbsp;·&nbsp; Market intelligence &nbsp;·&nbsp; Recommendations</p>
+                    <h1 class="tp-hero__title">Personal Trading Platform</h1>
+                    <p class="tp-hero__subtitle">Portfolio analytics &nbsp;·&nbsp; Market intelligence &nbsp;·&nbsp; Recommendations</p>
                 </div>
-                <div style="
-                    border: 1px solid rgba(196,87,58,0.35);
-                    border-radius: 6px;
-                    padding: 0.5rem 1rem;
-                    text-align: right;
-                ">
-                    <p style="
-                        color: #9C8D83;
-                        font-family: 'DM Sans', system-ui, sans-serif;
-                        font-size: 0.66rem;
-                        font-weight: 500;
-                        letter-spacing: 0.08em;
-                        margin: 0 0 0.3rem;
-                        text-transform: uppercase;
-                    ">Latest snapshot</p>
-                    <p style="
-                        color: #C4573A;
-                        font-family: 'DM Sans', system-ui, sans-serif;
-                        font-size: 0.85rem;
-                        font-weight: 600;
-                        margin: 0 0 0.1rem;
-                    ">SNAPSHOT_DATE</p>
-                    <p style="
-                        color: #9C8D83;
-                        font-family: 'DM Sans', system-ui, sans-serif;
-                        font-size: 0.72rem;
-                        font-weight: 400;
-                        margin: 0;
-                    ">SNAPSHOT_TIME</p>
+                <div class="tp-hero__badge">
+                    <p class="tp-hero__badge-label">Latest snapshot</p>
+                    <p class="tp-hero__badge-date">SNAPSHOT_DATE</p>
+                    <p class="tp-hero__badge-time">SNAPSHOT_TIME</p>
                 </div>
             </div>
         </div>
@@ -1459,8 +1529,8 @@ else:
         unsafe_allow_html=True,
     )
 
-    tab_portfolio, tab_diary, tab_signals, tab_observability = st.tabs(
-        ["Portfolio", "Diary", "Signals", "Observability"]
+    tab_portfolio, tab_diary, tab_signals, tab_observability, tab_admin = st.tabs(
+        ["Portfolio", "Diary", "Signals", "Observability", "Admin"]
     )
 
     # ── Portfolio tab ────────────────────────────────────────────────────────
@@ -1573,6 +1643,66 @@ else:
             else:
                 st.info("No candidates yet. Run src/strategies/generate_trade_candidates.py first.")
 
+        st.markdown("---")
+        st.markdown("##### News Sentiment Coverage")
+        try:
+            engine = postgres_engine()
+            with engine.connect() as conn:
+                news_coverage = pd.read_sql(text("""
+                    select
+                        symbol,
+                        count(*) as total_articles,
+                        round(avg(sentiment_score)::numeric, 3) as avg_sentiment,
+                        case
+                            when avg(sentiment_score) > 0.1  then 'positive'
+                            when avg(sentiment_score) < -0.1 then 'negative'
+                            else 'neutral'
+                        end as tone,
+                        max(published_at) as latest_article,
+                        max(fetched_at) as last_fetched,
+                        count(distinct date(published_at)) as days_with_news
+                    from app.holding_news_sentiment
+                    group by symbol
+                    order by last_fetched desc
+                """), conn)
+            if news_coverage.empty:
+                st.info("No news sentiment records found.")
+            else:
+                st.dataframe(_humanize_columns(news_coverage), use_container_width=True, hide_index=True)
+        except Exception as exc:  # noqa: BLE001
+            st.warning(f"Could not load news sentiment coverage: {exc}")
+
     # ── Observability tab ────────────────────────────────────────────────────
     with tab_observability:
         _render_observability()
+
+    # ── Admin tab ────────────────────────────────────────────────────────────
+    with tab_admin:
+        st.subheader("Admin Settings")
+
+        # ── Appearance ───────────────────────────────────────────────────────
+        st.markdown("##### Appearance")
+        _appearance_col, _ = st.columns([1, 2])
+        with _appearance_col:
+            selected_theme = _render_theme_selector(theme_catalog, str(active_theme["name"]))
+        if str(selected_theme["name"]) != str(active_theme["name"]):
+            active_theme = selected_theme
+            _inject_styles(active_theme)
+
+        st.markdown("---")
+
+        # ── Portfolio ────────────────────────────────────────────────────────
+        st.markdown("##### Portfolio")
+        st.info("Portfolio configuration settings will appear here.")
+
+        st.markdown("---")
+
+        # ── Data Sources ─────────────────────────────────────────────────────
+        st.markdown("##### Data Sources")
+        st.info("API key configuration and data source settings will appear here.")
+
+        st.markdown("---")
+
+        # ── Pipeline Schedule ────────────────────────────────────────────────
+        st.markdown("##### Pipeline Schedule")
+        st.info("Cron schedule configuration will appear here.")
