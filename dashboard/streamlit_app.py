@@ -32,70 +32,73 @@ st.set_page_config(page_title="Trading Platform Dashboard", layout="wide")
 def _inject_styles() -> None:
     """Inject global typography and colour-palette styles.
 
-    Typography: River Island editorial aesthetic.
-      - Headings → Cormorant Garamond (high-fashion editorial serif)
-      - Body / UI labels → DM Sans (clean geometric sans-serif)
+    Typography: River Island official design system.
+      - Display / editorial → Fraunces italic (96pt / 1.05 lh)
+      - Headings + UI → Plus Jakarta Sans (PJS) bold/extra-bold
+      - Body → Plus Jakarta Sans 400/500
+      - Eyebrow labels → PJS 700, uppercase, wide tracking
 
-    Palette: River Island brand colours — light theme.
-      --ri-bg          #FFFFFF   pure white (page background)
-      --ri-bg2         #F5F3EE   warm cream (secondary background / panels)
-      --ri-card        #FFFFFF   white (card surfaces)
-      --ri-border      #E2DDD5   warm stone (borders / dividers)
-      --ri-primary     #C41E3A   RI Crimson (primary accent / interactive)
-      --ri-primary-dk  #A01830   deep crimson (hover / pressed)
-      --ri-accent      #B08A5C   warm gold (secondary accent)
-      --ri-text        #1A1A1A   near-black (primary text)
-      --ri-text-muted  #7A7269   warm grey (secondary / caption text)
-      --ri-up          #2D7A50   deep forest green (positive / gain)
-      --ri-down        #C41E3A   RI Crimson (negative / loss)
-      --ri-link        #C41E3A   RI Crimson (hyperlinks)
+    Palette: River Island official design tokens.
+      --ri-bg          #F7F3ED   Bone (page background)
+      --ri-bg2         #F0E7DA   Cream (secondary background / panels)
+      --ri-card        #FFFFFF   White (elevated card surfaces)
+      --ri-border      #DDD5C8   warm stone (borders / dividers)
+      --ri-primary     #A72A11   Rust (primary accent / interactive)
+      --ri-primary-dk  #69222E   Port (hover / pressed)
+      --ri-accent      #E29A2D   Amber (secondary accent / today highlight)
+      --ri-text        #1F1B17   Ink Deep (primary text, FG-1)
+      --ri-text-muted  #7A726C   warm mid-grey (secondary text, FG-3)
+      --ri-up          #256238   Moss (positive / gain)
+      --ri-down        #A72A11   Rust (negative / loss)
+      --ri-link        #A72A11   Rust (hyperlinks)
     """
     st.markdown(
         """
         <style>
         /* ── Google Fonts ─────────────────────────────────────── */
-        @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
         /* ── River Island palette variables ──────────────────── */
         :root {
-            --ri-bg:          #FFFFFF;
-            --ri-bg2:         #F5F3EE;
+            --ri-bg:          #F7F3ED;
+            --ri-bg2:         #F0E7DA;
             --ri-card:        #FFFFFF;
-            --ri-border:      #E2DDD5;
-            --ri-primary:     #C41E3A;
-            --ri-primary-dk:  #A01830;
-            --ri-accent:      #B08A5C;
-            --ri-text:        #1A1A1A;
-            --ri-text-muted:  #7A7269;
-            --ri-up:          #2D7A50;
-            --ri-down:        #C41E3A;
-            --ri-link:        #C41E3A;
+            --ri-border:      #DDD5C8;
+            --ri-primary:     #A72A11;
+            --ri-primary-dk:  #69222E;
+            --ri-accent:      #E29A2D;
+            --ri-text:        #1F1B17;
+            --ri-text-muted:  #7A726C;
+            --ri-up:          #256238;
+            --ri-down:        #A72A11;
+            --ri-link:        #A72A11;
         }
 
         /* ── Typography base ──────────────────────────────────── */
         html, body, [class*="css"] {
-            font-family: 'DM Sans', system-ui, sans-serif;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
         }
 
-        /* ── Display headings — River Island editorial serif ──── */
+        /* ── Display headings — Fraunces editorial italic ─────── */
         h1 {
-            font-family: 'Cormorant Garamond', Georgia, serif !important;
-            font-weight: 600 !important;
+            font-family: 'Fraunces', Georgia, serif !important;
+            font-style: italic !important;
+            font-weight: 400 !important;
             font-size: 2.5rem !important;
-            letter-spacing: 0.01em !important;
+            letter-spacing: -0.01em !important;
             color: var(--ri-text) !important;
         }
         h2, h3 {
-            font-family: 'Cormorant Garamond', Georgia, serif !important;
-            font-weight: 600 !important;
-            letter-spacing: 0.015em !important;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.01em !important;
             color: var(--ri-text) !important;
         }
-        /* Section labels — small-caps utility style */
+        /* Section eyebrow labels */
         h4, h5, h6 {
-            font-family: 'DM Sans', system-ui, sans-serif !important;
-            font-weight: 600 !important;
-            font-size: 0.76rem !important;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 0.72rem !important;
             letter-spacing: 0.09em !important;
             text-transform: uppercase !important;
             color: var(--ri-text-muted) !important;
@@ -104,17 +107,17 @@ def _inject_styles() -> None:
         /* ── Streamlit metric widget ──────────────────────────── */
         [data-testid="stMetricLabel"] p,
         [data-testid="stMetric"] label {
-            font-family: 'DM Sans', sans-serif !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
             font-size: 0.72rem !important;
-            font-weight: 500 !important;
+            font-weight: 600 !important;
             letter-spacing: 0.07em !important;
             text-transform: uppercase !important;
             color: var(--ri-text-muted) !important;
         }
         [data-testid="stMetricValue"] {
-            font-family: 'DM Sans', system-ui, sans-serif !important;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
             font-size: 1.9rem !important;
-            font-weight: 600 !important;
+            font-weight: 700 !important;
             color: var(--ri-text) !important;
         }
 
@@ -124,9 +127,9 @@ def _inject_styles() -> None:
             border: none !important;
             border-radius: 4px !important;
             color: #ffffff !important;
-            font-family: 'DM Sans', sans-serif !important;
-            font-size: 0.76rem !important;
-            font-weight: 600 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-size: 0.72rem !important;
+            font-weight: 700 !important;
             letter-spacing: 0.09em !important;
             text-transform: uppercase !important;
             padding: 0.5rem 1.5rem !important;
@@ -139,9 +142,9 @@ def _inject_styles() -> None:
 
         /* ── Selectbox label ──────────────────────────────────── */
         [data-testid="stSelectbox"] label p {
-            font-family: 'DM Sans', sans-serif !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
             font-size: 0.72rem !important;
-            font-weight: 500 !important;
+            font-weight: 600 !important;
             letter-spacing: 0.07em !important;
             text-transform: uppercase !important;
             color: var(--ri-text-muted) !important;
@@ -157,7 +160,7 @@ def _inject_styles() -> None:
         /* ── Captions ─────────────────────────────────────────── */
         [data-testid="stCaptionContainer"] p,
         .stCaption p {
-            font-family: 'DM Sans', sans-serif !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
             font-size: 0.76rem !important;
             color: var(--ri-text-muted) !important;
         }
@@ -175,10 +178,10 @@ def _inject_styles() -> None:
 
         /* ── Tabs ─────────────────────────────────────────────── */
         button[data-baseweb="tab"] {
-            font-family: 'DM Sans', system-ui, sans-serif !important;
-            font-size: 0.9rem !important;
-            font-weight: 500 !important;
-            letter-spacing: 0.03em !important;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+            font-size: 0.88rem !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.02em !important;
         }
 
         /* ── Horizontal rules ─────────────────────────────────── */
@@ -573,42 +576,42 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
         <style>
         .holding-table-wrap {
             overflow-x: auto;
-            border: 1px solid #E2DDD5;
+            border: 1px solid #DDD5C8;
             border-radius: 10px;
         }
         .holding-table-wrap table {
             background: #FFFFFF;
             border-collapse: collapse;
-            font-family: 'DM Sans', system-ui, sans-serif;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
             font-size: 0.87rem;
             width: 100%;
         }
         .holding-table-wrap th,
         .holding-table-wrap td {
-            border-bottom: 1px solid #EDE9E2;
-            color: #1A1A1A;
+            border-bottom: 1px solid #E8DFD0;
+            color: #1F1B17;
             padding: 0.65rem 0.9rem;
             text-align: left;
             white-space: nowrap;
         }
         .holding-table-wrap th {
-            background: #F5F3EE;
-            color: #7A7269;
+            background: #F0E7DA;
+            color: #7A726C;
             font-size: 0.70rem;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 0.09em;
             text-transform: uppercase;
         }
         .holding-table-wrap tr:hover td {
-            background: #FBF9F6;
+            background: #FAF6F1;
         }
         .holding-table-wrap a {
-            color: #C41E3A;
+            color: #A72A11;
             font-weight: 600;
             text-decoration: none;
         }
         .holding-table-wrap a:hover {
-            color: #A01830;
+            color: #69222E;
             text-decoration: underline;
         }
         .holding-move {
@@ -617,9 +620,9 @@ def _render_holding_table(holding_frame: pd.DataFrame) -> None:
             font-weight: 700;
             line-height: 1;
         }
-        .holding-move--up   { color: #2D7A50; }
-        .holding-move--down { color: #C41E3A; }
-        .holding-move--flat { color: #B0A99E; }
+        .holding-move--up   { color: #256238; }
+        .holding-move--down { color: #A72A11; }
+        .holding-move--flat { color: #B0A898; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -673,10 +676,10 @@ def _render_holding_history_chart(history_df: pd.DataFrame, gross_profit_indicat
                 margin-top: 0.15rem;
             }}
             .holding-history-profit__value {{
-                color: #1A1A1A;
-                font-family: 'DM Sans', system-ui, sans-serif;
+                color: #1F1B17;
+                font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
                 font-size: 1.85rem;
-                font-weight: 600;
+                font-weight: 700;
                 line-height: 1.2;
             }}
             .holding-history-profit .holding-move {{
@@ -684,9 +687,9 @@ def _render_holding_history_chart(history_df: pd.DataFrame, gross_profit_indicat
                 font-weight: 700;
                 line-height: 1;
             }}
-            .holding-history-profit .holding-move--up   {{ color: #2D7A50; }}
-            .holding-history-profit .holding-move--down {{ color: #C41E3A; }}
-            .holding-history-profit .holding-move--flat {{ color: #B0A99E; }}
+            .holding-history-profit .holding-move--up   {{ color: #256238; }}
+            .holding-history-profit .holding-move--down {{ color: #A72A11; }}
+            .holding-history-profit .holding-move--flat {{ color: #B0A898; }}
             </style>
             <div class="holding-history-profit">
                 <span class="holding-history-profit__value">{escape(_format_currency(latest_history.get("gain_loss_value")))}</span>
@@ -1098,13 +1101,13 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
     html_parts = [
         """
         <style>
-        /* ── Market calendar — River Island light palette ───── */
+        /* ── Market calendar — River Island design tokens ────── */
         .market-calendar {
-            background: #F5F3EE;
-            border: 1px solid #E2DDD5;
+            background: #F0E7DA;
+            border: 1px solid #DDD5C8;
             border-radius: 16px;
             display: grid;
-            font-family: 'DM Sans', system-ui, sans-serif;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
             grid-template-columns: repeat(7, minmax(0, 1fr));
             gap: 1px;
             margin-top: 0.75rem;
@@ -1112,10 +1115,10 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             padding: 1px;
         }
         .market-calendar__header {
-            background: #EDE9E2;
-            color: #7A7269;
+            background: #E8DFD0;
+            color: #7A726C;
             font-size: 0.70rem;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 0.09em;
             min-height: 42px;
             padding: 0.75rem 0.75rem;
@@ -1129,20 +1132,21 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             position: relative;
         }
         .market-calendar__day--empty {
-            background: #FAF8F4;
+            background: #FAF6F1;
         }
         .market-calendar__day--today {
-            background: #FDFAF5;
-            border-top: 2px solid #B08A5C;
+            background: #FFFDF7;
+            border-top: 2px solid #E29A2D;
         }
         .market-calendar__day--today .market-calendar__day-number {
-            color: #B08A5C;
+            color: #E29A2D;
         }
         .market-calendar__day-number {
-            color: #1A1A1A;
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            color: #1F1B17;
+            font-family: 'Fraunces', Georgia, serif;
+            font-style: italic;
             font-size: 1.05rem;
-            font-weight: 600;
+            font-weight: 400;
             margin-bottom: 0.4rem;
         }
         .market-calendar__events {
@@ -1150,24 +1154,40 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             flex-direction: column;
             gap: 0.3rem;
         }
+        /* Base event card — Rust (earnings/default) */
         .market-calendar__event {
-            background: #C41E3A;
-            border-left: 4px solid #8C0F22;
+            background: #A72A11;
+            border-left: 4px solid #69222E;
             border-radius: 6px;
             color: #FFFFFF;
             cursor: default;
             padding: 0.42rem 0.58rem;
             position: relative;
         }
+        /* Dividend → Moss green */
+        .market-calendar__event--dividend {
+            background: #256238;
+            border-left-color: #1A4428;
+        }
+        /* Ex-date → Cobalt */
+        .market-calendar__event--ex_dividend,
+        .market-calendar__event--ex_date {
+            background: #1D418E;
+            border-left-color: #142E66;
+        }
+        /* Split → Aubergine */
+        .market-calendar__event--split {
+            background: #722E6F;
+            border-left-color: #50205D;
+        }
         .market-calendar__event-line {
             display: block;
             line-height: 1.2;
         }
         .market-calendar__event-date {
-            color: #FFCCD3;
+            color: rgba(255,255,255,0.7);
             font-size: 0.68rem;
             font-weight: 600;
-            opacity: 0.96;
         }
         .market-calendar__event-symbol {
             color: #FFFFFF;
@@ -1176,18 +1196,17 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             margin-top: 0.12rem;
         }
         .market-calendar__event-type {
-            color: #FFE0E4;
+            color: rgba(255,255,255,0.8);
             font-size: 0.71rem;
-            opacity: 0.9;
             text-transform: capitalize;
         }
         .market-calendar__tooltip {
             background: #FFFFFF;
-            border: 1px solid #E2DDD5;
+            border: 1px solid #DDD5C8;
             border-radius: 10px;
             bottom: calc(100% + 10px);
-            box-shadow: 0 12px 32px rgba(26,26,26,0.14);
-            color: #1A1A1A;
+            box-shadow: 0 12px 32px rgba(31,27,23,0.12);
+            color: #1F1B17;
             left: 0;
             opacity: 0;
             padding: 0.8rem 0.9rem;
@@ -1214,26 +1233,26 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
             visibility: visible;
         }
         .market-calendar__tooltip-title {
-            color: #C41E3A;
+            color: #A72A11;
             font-size: 0.88rem;
             font-weight: 700;
             margin-bottom: 0.35rem;
         }
         .market-calendar__tooltip-line {
-            color: #7A7269;
+            color: #7A726C;
             display: block;
             font-size: 0.77rem;
             line-height: 1.35;
             margin-top: 0.14rem;
         }
         .market-calendar__tooltip-line strong {
-            color: #1A1A1A;
+            color: #1F1B17;
         }
         .calendar-empty {
-            background: #F5F3EE;
-            border: 1px solid #E2DDD5;
+            background: #F0E7DA;
+            border: 1px solid #DDD5C8;
             border-radius: 10px;
-            color: #7A7269;
+            color: #7A726C;
             padding: 1rem;
         }
         </style>
@@ -1263,8 +1282,9 @@ def _build_market_calendar_html(frame: pd.DataFrame, selected_month: int) -> str
                     tooltip_lines.append(
                         f"<span class='market-calendar__tooltip-line'><strong>Timestamp:</strong> {escape(str(event.get('event_timestamp', '')))}</span>"
                     )
-                event_cards.append(
-                    "<div class='market-calendar__event'>"
+                event_type_slug = str(event.get("event_type", "")).lower().replace(" ", "_")
+            event_cards.append(
+                    f"<div class='market-calendar__event market-calendar__event--{escape(event_type_slug)}'>"
                     f"<span class='market-calendar__event-line market-calendar__event-date'>{escape(event['event_date'].strftime('%d %b'))} {escape(str(event.get('event_name', '')))}</span>"
                     f"<span class='market-calendar__event-line market-calendar__event-symbol'>{escape(str(event.get('symbol', '')))}</span>"
                     f"<span class='market-calendar__event-line market-calendar__event-type'>{escape(str(event.get('event_type', '')))}</span>"
@@ -1308,20 +1328,20 @@ if _has_holding_route(holding_route):
     st.markdown(
         """
         <div style="
-            background: #F2EBE3;
+            background: #F0E7DA;
             border-radius: 12px;
             margin-bottom: 1.25rem;
             overflow: hidden;
-            border: 1px solid #E4D8CC;
+            border: 1px solid #DDD5C8;
         ">
-            <div style="background: #C4573A; height: 5px; width: 100%;"></div>
+            <div style="background: #A72A11; height: 5px; width: 100%;"></div>
             <div style="padding: 1.4rem 2rem 1.3rem;">
                 <h1 style="
-                    color: #C4573A;
-                    font-family: 'Barlow', system-ui, sans-serif;
+                    color: #A72A11;
+                    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
                     font-size: 2.2rem;
-                    font-weight: 500;
-                    letter-spacing: 0.06em;
+                    font-weight: 800;
+                    letter-spacing: 0.04em;
                     line-height: 1.1;
                     margin: 0;
                     text-transform: uppercase;
@@ -1385,13 +1405,13 @@ else:
 
     _banner_html = """
         <div style="
-            background: #F2EBE3;
+            background: #F0E7DA;
             border-radius: 12px;
             margin-bottom: 2rem;
             overflow: hidden;
-            border: 1px solid #E4D8CC;
+            border: 1px solid #DDD5C8;
         ">
-            <div style="background: #C4573A; height: 5px; width: 100%;"></div>
+            <div style="background: #A72A11; height: 5px; width: 100%;"></div>
             <div style="
                 align-items: flex-end;
                 display: flex;
@@ -1400,50 +1420,50 @@ else:
             ">
                 <div>
                     <h1 style="
-                        color: #C4573A;
-                        font-family: 'Barlow', system-ui, sans-serif;
+                        color: #A72A11;
+                        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
                         font-size: 2.8rem;
-                        font-weight: 500;
-                        letter-spacing: 0.06em;
+                        font-weight: 800;
+                        letter-spacing: 0.04em;
                         line-height: 1.1;
                         margin: 0;
                         text-transform: uppercase;
                     ">Personal Trading Platform</h1>
                     <p style="
-                        color: #7A6E65;
-                        font-family: 'DM Sans', system-ui, sans-serif;
-                        font-size: 0.76rem;
-                        font-weight: 400;
+                        color: #7A726C;
+                        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+                        font-size: 0.72rem;
+                        font-weight: 500;
                         letter-spacing: 0.08em;
                         margin: 0.85rem 0 0;
                         text-transform: uppercase;
                     ">Portfolio analytics &nbsp;·&nbsp; Market intelligence &nbsp;·&nbsp; Recommendations</p>
                 </div>
                 <div style="
-                    border: 1px solid rgba(196,87,58,0.35);
+                    border: 1px solid rgba(167,42,17,0.3);
                     border-radius: 6px;
                     padding: 0.5rem 1rem;
                     text-align: right;
                 ">
                     <p style="
-                        color: #9C8D83;
-                        font-family: 'DM Sans', system-ui, sans-serif;
-                        font-size: 0.66rem;
-                        font-weight: 500;
+                        color: #7A726C;
+                        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+                        font-size: 0.65rem;
+                        font-weight: 600;
                         letter-spacing: 0.08em;
                         margin: 0 0 0.3rem;
                         text-transform: uppercase;
                     ">Latest snapshot</p>
                     <p style="
-                        color: #C4573A;
-                        font-family: 'DM Sans', system-ui, sans-serif;
+                        color: #A72A11;
+                        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
                         font-size: 0.85rem;
-                        font-weight: 600;
+                        font-weight: 700;
                         margin: 0 0 0.1rem;
                     ">SNAPSHOT_DATE</p>
                     <p style="
-                        color: #9C8D83;
-                        font-family: 'DM Sans', system-ui, sans-serif;
+                        color: #7A726C;
+                        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
                         font-size: 0.72rem;
                         font-weight: 400;
                         margin: 0;
