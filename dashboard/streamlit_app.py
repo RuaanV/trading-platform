@@ -849,7 +849,7 @@ def _render_holding_history_chart(history_df: pd.DataFrame, gross_profit_indicat
             .holding-history-profit .holding-move--flat {{ color: var(--ri-flat); }}
             </style>
             <div class="holding-history-profit">
-                <span class="holding-history-profit__value">{escape(_format_currency(latest_history.get("gain_loss_value")))}</span>
+                <span class="holding-history-profit__value">£{escape(_format_currency(latest_history.get("gain_loss_value")))}</span>
                 {gross_profit_indicator}
             </div>
             """,
