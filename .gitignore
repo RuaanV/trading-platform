@@ -25,3 +25,9 @@ dbt/target/
 # OS/editor
 .DS_Store
 .vscode/
+
+# Claude Code
+.claude/
+
+# Logs
+logs/
