@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Unique label for launchd -->
+    <key>Label</key>
+    <string>com.trading.cowork-bridge</string>
+
+    <!-- Script to run -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/ruaan.venter/code/trading-platform/scripts/cowork_bridge.sh</string>
+    </array>
+
+    <!-- Start on login -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Restart automatically if it crashes or exits -->
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Redirect stdout/stderr to the project log (belt-and-suspenders; script also logs) -->
+    <key>StandardOutPath</key>
+    <string>/Users/ruaan.venter/code/trading-platform/logs/cowork_bridge.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/ruaan.venter/code/trading-platform/logs/cowork_bridge.log</string>
+
+    <!-- Working directory -->
+    <key>WorkingDirectory</key>
+    <string>/Users/ruaan.venter/code/trading-platform</string>
+
+    <!-- Inherit the login environment so PATH/.venv/env vars are available -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HOME</key>
+        <string>/Users/ruaan.venter</string>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+</dict>
+</plist>

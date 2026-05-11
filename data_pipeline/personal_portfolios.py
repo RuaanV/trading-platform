@@ -301,12 +301,16 @@ def fetch_personal_portfolios() -> pd.DataFrame:
 
 def fetch_portfolio_holdings() -> pd.DataFrame:
     engine = postgres_engine()
+    # previous_price is the last price recorded on a *different* (earlier) calendar
+    # day (UTC), so the Move indicator on the dashboard always reflects the change
+    # from the previous trading day's close — not an earlier run on the same day.
     query = f"""
     with latest_snapshot as (
         select distinct on (portfolio_id)
             id,
             portfolio_id,
             snapshot_at,
+            (snapshot_at at time zone 'UTC')::date as snapshot_day,
             source_updated_at,
             quote_delay_note,
             source_name,
@@ -314,19 +318,25 @@ def fetch_portfolio_holdings() -> pd.DataFrame:
         from {PORTFOLIO_SCHEMA}.{SNAPSHOT_TABLE}
         order by portfolio_id, snapshot_at desc, id desc
     ),
-    holdings_with_prev as (
+    prev_day_snapshot as (
+        select distinct on (s.portfolio_id)
+            s.id,
+            s.portfolio_id
+        from {PORTFOLIO_SCHEMA}.{SNAPSHOT_TABLE} s
+        join latest_snapshot ls on ls.portfolio_id = s.portfolio_id
+        where (s.snapshot_at at time zone 'UTC')::date < ls.snapshot_day
+        order by s.portfolio_id, s.snapshot_at desc, s.id desc
+    ),
+    prev_prices as (
         select
-            h.*,
-            lag(h.price) over (
-                partition by h.portfolio_id, upper(coalesce(h.ticker, ''))
-                order by s.snapshot_at asc, s.id asc, h.id asc
-            ) as previous_price
+            h.portfolio_id,
+            upper(coalesce(h.ticker, '')) as ticker_key,
+            h.price                        as previous_price
         from {PORTFOLIO_SCHEMA}.{HOLDINGS_TABLE} h
-        join {PORTFOLIO_SCHEMA}.{SNAPSHOT_TABLE} s
-          on s.id = h.snapshot_id
+        join prev_day_snapshot ps on ps.id = h.snapshot_id
     )
     select
-        p.name as portfolio_name,
+        p.name          as portfolio_name,
         p.holder,
         p.portfolio_type,
         ls.snapshot_at,
@@ -338,7 +348,7 @@ def fetch_portfolio_holdings() -> pd.DataFrame:
         h.quantity,
         h.quantity_label,
         h.price,
-        h.previous_price,
+        pp.previous_price,
         h.market_value,
         h.total_cost,
         h.gain_loss_value,
@@ -350,8 +360,11 @@ def fetch_portfolio_holdings() -> pd.DataFrame:
     from latest_snapshot ls
     join {PORTFOLIO_SCHEMA}.{PORTFOLIO_TABLE} p
       on p.id = ls.portfolio_id
-    join holdings_with_prev h
+    join {PORTFOLIO_SCHEMA}.{HOLDINGS_TABLE} h
       on h.snapshot_id = ls.id
+    left join prev_prices pp
+      on pp.portfolio_id = ls.portfolio_id
+     and pp.ticker_key = upper(coalesce(h.ticker, ''))
     order by p.holder, p.name, h.market_value desc nulls last, h.company;
     """
     return pd.read_sql(text(query), engine)

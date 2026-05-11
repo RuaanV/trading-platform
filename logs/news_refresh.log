@@ -1,0 +1,247 @@
+2026-04-22T20:30:03Z INFO news_refresh started at=2026-04-22T20:30:03.146252+00:00
+2026-04-22T20:30:03Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-04-22T20:30:04Z INFO symbol=AAPL status=ok headlines=10 sentiment=neutral
+2026-04-22T20:30:04Z INFO symbol=AMZN status=ok headlines=10 sentiment=neutral
+2026-04-22T20:30:04Z INFO symbol=ASC status=no_news_today
+2026-04-22T20:30:05Z INFO symbol=BA. status=no_news_today
+2026-04-22T20:30:05Z INFO symbol=GOOG status=ok headlines=10 sentiment=neutral
+2026-04-22T20:30:05Z INFO symbol=GSK status=ok headlines=2 sentiment=neutral
+2026-04-22T20:30:05Z INFO symbol=HLN status=no_news_today
+2026-04-22T20:30:05Z INFO symbol=ISF status=no_news_today
+2026-04-22T20:30:05Z INFO symbol=IUKD status=no_news_today
+2026-04-22T20:30:06Z INFO symbol=LLOY status=ok headlines=2 sentiment=neutral
+2026-04-22T20:30:06Z INFO symbol=MSFT status=ok headlines=10 sentiment=neutral
+2026-04-22T20:30:06Z INFO symbol=NVDA status=ok headlines=10 sentiment=neutral
+2026-04-22T20:30:07Z INFO symbol=NWG status=ok headlines=1 sentiment=neutral
+2026-04-22T20:30:07Z INFO symbol=RGTI status=no_news_today
+2026-04-22T20:30:07Z INFO symbol=SNOW status=ok headlines=4 sentiment=neutral
+2026-04-22T20:30:07Z INFO symbol=VOD status=ok headlines=1 sentiment=neutral
+2026-04-22T20:30:07Z INFO news_refresh finished at=2026-04-22T20:30:07.717868+00:00 duration_s=4.6 success=10 skipped=6 failed=0
+2026-04-23T20:30:02Z INFO news_refresh started at=2026-04-23T20:30:02.457519+00:00
+2026-04-23T20:30:02Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-04-23T20:30:03Z INFO symbol=AAPL status=ok headlines=9 sentiment=neutral
+2026-04-23T20:30:03Z INFO symbol=AMZN status=ok headlines=8 sentiment=neutral
+2026-04-23T20:30:04Z INFO symbol=ASC status=ok headlines=1 sentiment=neutral
+2026-04-23T20:30:04Z INFO symbol=BA. status=no_news_today
+2026-04-23T20:30:04Z INFO symbol=GOOG status=ok headlines=10 sentiment=neutral
+2026-04-23T20:30:04Z INFO symbol=GSK status=no_news_today
+2026-04-23T20:30:04Z INFO symbol=HLN status=no_news_today
+2026-04-23T20:30:04Z INFO symbol=ISF status=no_news_today
+2026-04-23T20:30:05Z INFO symbol=IUKD status=no_news_today
+2026-04-23T20:30:05Z INFO symbol=LLOY status=no_news_today
+2026-04-23T20:30:05Z INFO symbol=MSFT status=ok headlines=10 sentiment=neutral
+2026-04-23T20:30:05Z INFO symbol=NVDA status=ok headlines=9 sentiment=neutral
+2026-04-23T20:30:06Z INFO symbol=NWG status=no_news_today
+2026-04-23T20:30:06Z INFO symbol=RGTI status=ok headlines=1 sentiment=neutral
+2026-04-23T20:30:06Z INFO symbol=SNOW status=ok headlines=2 sentiment=neutral
+2026-04-23T20:30:06Z INFO symbol=VOD status=no_news_today
+2026-04-23T20:30:06Z INFO news_refresh finished at=2026-04-23T20:30:06.738210+00:00 duration_s=4.3 success=8 skipped=8 failed=0
+2026-04-24T20:30:02Z INFO news_refresh started at=2026-04-24T20:30:02.388922+00:00
+2026-04-24T20:30:02Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-04-24T20:30:03Z INFO symbol=AAPL status=ok headlines=10 sentiment=neutral
+2026-04-24T20:30:03Z INFO symbol=AMZN status=ok headlines=10 sentiment=neutral
+2026-04-24T20:30:03Z INFO symbol=ASC status=ok headlines=2 sentiment=neutral
+2026-04-24T20:30:04Z INFO symbol=BA. status=ok headlines=1 sentiment=neutral
+2026-04-24T20:30:04Z INFO symbol=GOOG status=ok headlines=10 sentiment=neutral
+2026-04-24T20:30:04Z INFO symbol=GSK status=no_news_today
+2026-04-24T20:30:04Z INFO symbol=HLN status=no_news_today
+2026-04-24T20:30:04Z INFO symbol=ISF status=no_news_today
+2026-04-24T20:30:04Z INFO symbol=IUKD status=no_news_today
+2026-04-24T20:30:05Z INFO symbol=LLOY status=ok headlines=1 sentiment=neutral
+2026-04-24T20:30:05Z INFO symbol=MSFT status=ok headlines=10 sentiment=neutral
+2026-04-24T20:30:05Z INFO symbol=NVDA status=ok headlines=10 sentiment=neutral
+2026-04-24T20:30:06Z INFO symbol=NWG status=ok headlines=2 sentiment=neutral
+2026-04-24T20:30:06Z INFO symbol=RGTI status=ok headlines=1 sentiment=neutral
+2026-04-24T20:30:06Z INFO symbol=SNOW status=ok headlines=1 sentiment=neutral
+2026-04-24T20:30:06Z INFO symbol=VOD status=ok headlines=1 sentiment=neutral
+2026-04-24T20:30:06Z INFO news_refresh finished at=2026-04-24T20:30:06.718031+00:00 duration_s=4.3 success=12 skipped=4 failed=0
+2026-04-27T20:30:02Z INFO news_refresh started at=2026-04-27T20:30:02.913398+00:00
+2026-04-27T20:30:03Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-04-27T20:30:03Z INFO symbol=AAPL status=ok headlines=10 sentiment=neutral
+2026-04-27T20:30:04Z INFO symbol=AMZN status=ok headlines=10 sentiment=neutral
+2026-04-27T20:30:04Z INFO symbol=ASC status=no_news_today
+2026-04-27T20:30:04Z INFO symbol=BA. status=no_news_today
+2026-04-27T20:30:04Z INFO symbol=GOOG status=ok headlines=10 sentiment=neutral
+2026-04-27T20:30:04Z INFO symbol=GSK status=ok headlines=2 sentiment=neutral
+2026-04-27T20:30:04Z INFO symbol=HLN status=no_news_today
+2026-04-27T20:30:05Z INFO symbol=ISF status=no_news_today
+2026-04-27T20:30:05Z INFO symbol=IUKD status=no_news_today
+2026-04-27T20:30:05Z INFO symbol=LLOY status=no_news_today
+2026-04-27T20:30:05Z INFO symbol=MSFT status=ok headlines=10 sentiment=neutral
+2026-04-27T20:30:05Z INFO symbol=NVDA status=ok headlines=10 sentiment=neutral
+2026-04-27T20:30:06Z INFO symbol=NWG status=no_news_today
+2026-04-27T20:30:06Z INFO symbol=RGTI status=ok headlines=2 sentiment=neutral
+2026-04-27T20:30:06Z INFO symbol=SNOW status=no_news_today
+2026-04-27T20:30:06Z INFO symbol=VOD status=ok headlines=1 sentiment=neutral
+2026-04-27T20:30:06Z INFO news_refresh finished at=2026-04-27T20:30:06.675445+00:00 duration_s=3.8 success=8 skipped=8 failed=0
+2026-04-28T20:30:02Z INFO news_refresh started at=2026-04-28T20:30:02.503454+00:00
+2026-04-28T20:30:02Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-04-28T20:30:03Z INFO symbol=AAPL status=ok headlines=10 sentiment=neutral
+2026-04-28T20:30:03Z INFO symbol=AMZN status=ok headlines=9 sentiment=neutral
+2026-04-28T20:30:03Z INFO symbol=ASC status=no_news_today
+2026-04-28T20:30:03Z INFO symbol=BA. status=no_news_today
+2026-04-28T20:30:04Z INFO symbol=GOOG status=ok headlines=8 sentiment=neutral
+2026-04-28T20:30:04Z INFO symbol=GSK status=no_news_today
+2026-04-28T20:30:04Z INFO symbol=HLN status=no_news_today
+2026-04-28T20:30:04Z INFO symbol=ISF status=no_news_today
+2026-04-28T20:30:04Z INFO symbol=IUKD status=no_news_today
+2026-04-28T20:30:05Z INFO symbol=LLOY status=ok headlines=1 sentiment=neutral
+2026-04-28T20:30:05Z INFO symbol=MSFT status=ok headlines=8 sentiment=neutral
+2026-04-28T20:30:05Z INFO symbol=NVDA status=ok headlines=10 sentiment=neutral
+2026-04-28T20:30:05Z INFO symbol=NWG status=no_news_today
+2026-04-28T20:30:06Z INFO symbol=RGTI status=ok headlines=3 sentiment=neutral
+2026-04-28T20:30:06Z INFO symbol=SNOW status=ok headlines=3 sentiment=neutral
+2026-04-28T20:30:06Z INFO symbol=VOD status=ok headlines=1 sentiment=neutral
+2026-04-28T20:30:06Z INFO news_refresh finished at=2026-04-28T20:30:06.580896+00:00 duration_s=4.1 success=9 skipped=7 failed=0
+2026-04-29T20:30:02Z INFO news_refresh started at=2026-04-29T20:30:02.798102+00:00
+2026-04-29T20:30:02Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-04-29T20:30:03Z INFO symbol=AAPL status=ok headlines=9 sentiment=neutral
+2026-04-29T20:30:03Z INFO symbol=AMZN status=ok headlines=8 sentiment=neutral
+2026-04-29T20:30:04Z INFO symbol=ASC status=no_news_today
+2026-04-29T20:30:04Z INFO symbol=BA. status=no_news_today
+2026-04-29T20:30:04Z INFO symbol=GOOG status=ok headlines=8 sentiment=neutral
+2026-04-29T20:30:04Z INFO symbol=GSK status=ok headlines=7 sentiment=neutral
+2026-04-29T20:30:05Z INFO symbol=HLN status=ok headlines=4 sentiment=neutral
+2026-04-29T20:30:05Z INFO symbol=ISF status=no_news_today
+2026-04-29T20:30:05Z INFO symbol=IUKD status=no_news_today
+2026-04-29T20:30:05Z INFO symbol=LLOY status=ok headlines=3 sentiment=neutral
+2026-04-29T20:30:05Z INFO symbol=MSFT status=ok headlines=7 sentiment=neutral
+2026-04-29T20:30:06Z INFO symbol=NVDA status=ok headlines=10 sentiment=neutral
+2026-04-29T20:30:06Z INFO symbol=NWG status=ok headlines=1 sentiment=neutral
+2026-04-29T20:30:06Z INFO symbol=RGTI status=ok headlines=4 sentiment=neutral
+2026-04-29T20:30:06Z INFO symbol=SNOW status=ok headlines=2 sentiment=neutral
+2026-04-29T20:30:07Z INFO symbol=VOD status=no_news_today
+2026-04-29T20:30:07Z INFO news_refresh finished at=2026-04-29T20:30:07.122114+00:00 duration_s=4.3 success=11 skipped=5 failed=0
+2026-04-30T20:30:02Z INFO news_refresh started at=2026-04-30T20:30:02.801141+00:00
+2026-04-30T20:30:02Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-04-30T20:30:03Z INFO symbol=AAPL status=ok headlines=9 sentiment=neutral
+2026-04-30T20:30:03Z INFO symbol=AMZN status=ok headlines=5 sentiment=neutral
+2026-04-30T20:30:03Z INFO symbol=ASC status=no_news_today
+2026-04-30T20:30:04Z INFO symbol=BA. status=no_news_today
+2026-04-30T20:30:04Z INFO symbol=GOOG status=ok headlines=7 sentiment=neutral
+2026-04-30T20:30:04Z INFO symbol=GSK status=ok headlines=4 sentiment=neutral
+2026-04-30T20:30:04Z INFO symbol=HLN status=no_news_today
+2026-04-30T20:30:04Z INFO symbol=ISF status=no_news_today
+2026-04-30T20:30:04Z INFO symbol=IUKD status=no_news_today
+2026-04-30T20:30:05Z INFO symbol=LLOY status=ok headlines=2 sentiment=neutral
+2026-04-30T20:30:05Z INFO symbol=MSFT status=ok headlines=8 sentiment=neutral
+2026-04-30T20:30:05Z INFO symbol=NVDA status=ok headlines=10 sentiment=neutral
+2026-04-30T20:30:06Z INFO symbol=NWG status=no_news_today
+2026-04-30T20:30:06Z INFO symbol=RGTI status=ok headlines=1 sentiment=neutral
+2026-04-30T20:30:06Z INFO symbol=SNOW status=ok headlines=4 sentiment=neutral
+2026-04-30T20:30:06Z INFO symbol=VOD status=ok headlines=3 sentiment=neutral
+2026-04-30T20:30:06Z INFO news_refresh finished at=2026-04-30T20:30:06.736394+00:00 duration_s=3.9 success=10 skipped=6 failed=0
+2026-05-01T20:30:02Z INFO news_refresh started at=2026-05-01T20:30:02.480288+00:00
+2026-05-01T20:30:02Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-05-01T20:30:03Z INFO symbol=AAPL status=ok headlines=9 sentiment=neutral
+2026-05-01T20:30:03Z INFO symbol=AMZN status=ok headlines=8 sentiment=neutral
+2026-05-01T20:30:03Z INFO symbol=ASC status=no_news_today
+2026-05-01T20:30:04Z INFO symbol=BA. status=no_news_today
+2026-05-01T20:30:04Z INFO symbol=GOOG status=ok headlines=8 sentiment=neutral
+2026-05-01T20:30:04Z INFO symbol=GSK status=ok headlines=1 sentiment=neutral
+2026-05-01T20:30:05Z INFO symbol=HLN status=no_news_today
+2026-05-01T20:30:05Z INFO symbol=ISF status=no_news_today
+2026-05-01T20:30:05Z INFO symbol=IUKD status=no_news_today
+2026-05-01T20:30:05Z INFO symbol=LLOY status=no_news_today
+2026-05-01T20:30:05Z INFO symbol=MSFT status=ok headlines=9 sentiment=neutral
+2026-05-01T20:30:05Z INFO symbol=NVDA status=ok headlines=9 sentiment=neutral
+2026-05-01T20:30:06Z INFO symbol=NWG status=ok headlines=1 sentiment=neutral
+2026-05-01T20:30:06Z INFO symbol=RGTI status=no_news_today
+2026-05-01T20:30:06Z INFO symbol=SNOW status=ok headlines=1 sentiment=neutral
+2026-05-01T20:30:06Z INFO symbol=VOD status=no_news_today
+2026-05-01T20:30:06Z INFO news_refresh finished at=2026-05-01T20:30:06.710718+00:00 duration_s=4.2 success=8 skipped=8 failed=0
+2026-05-04T20:30:02Z INFO news_refresh started at=2026-05-04T20:30:02.955139+00:00
+2026-05-04T20:30:03Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-05-04T20:30:03Z INFO symbol=AAPL status=ok headlines=10 sentiment=neutral
+2026-05-04T20:30:04Z INFO symbol=AMZN status=ok headlines=10 sentiment=neutral
+2026-05-04T20:30:04Z INFO symbol=ASC status=no_news_today
+2026-05-04T20:30:04Z INFO symbol=BA. status=no_news_today
+2026-05-04T20:30:04Z INFO symbol=GOOG status=ok headlines=10 sentiment=neutral
+2026-05-04T20:30:05Z INFO symbol=GSK status=ok headlines=1 sentiment=neutral
+2026-05-04T20:30:05Z INFO symbol=HLN status=no_news_today
+2026-05-04T20:30:05Z INFO symbol=ISF status=no_news_today
+2026-05-04T20:30:05Z INFO symbol=IUKD status=no_news_today
+2026-05-04T20:30:05Z INFO symbol=LLOY status=ok headlines=1 sentiment=neutral
+2026-05-04T20:30:06Z INFO symbol=MSFT status=ok headlines=10 sentiment=neutral
+2026-05-04T20:30:06Z INFO symbol=NVDA status=ok headlines=10 sentiment=neutral
+2026-05-04T20:30:06Z INFO symbol=NWG status=ok headlines=1 sentiment=neutral
+2026-05-04T20:30:06Z INFO symbol=RGTI status=no_news_today
+2026-05-04T20:30:07Z INFO symbol=SNOW status=ok headlines=2 sentiment=neutral
+2026-05-04T20:30:07Z INFO symbol=VOD status=ok headlines=1 sentiment=neutral
+2026-05-04T20:30:07Z INFO news_refresh finished at=2026-05-04T20:30:07.328381+00:00 duration_s=4.4 success=10 skipped=6 failed=0
+2026-05-05T20:30:03Z INFO news_refresh started at=2026-05-05T20:30:03.045349+00:00
+2026-05-05T20:30:03Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-05-05T20:30:04Z INFO symbol=AAPL status=ok headlines=10 sentiment=neutral
+2026-05-05T20:30:04Z INFO symbol=AMZN status=ok headlines=9 sentiment=neutral
+2026-05-05T20:30:04Z INFO symbol=ASC status=no_news_today
+2026-05-05T20:30:04Z INFO symbol=BA. status=no_news_today
+2026-05-05T20:30:05Z INFO symbol=GOOG status=ok headlines=9 sentiment=neutral
+2026-05-05T20:30:05Z INFO symbol=GSK status=no_news_today
+2026-05-05T20:30:05Z INFO symbol=HLN status=ok headlines=1 sentiment=neutral
+2026-05-05T20:30:05Z INFO symbol=ISF status=no_news_today
+2026-05-05T20:30:05Z INFO symbol=IUKD status=no_news_today
+2026-05-05T20:30:05Z INFO symbol=LLOY status=no_news_today
+2026-05-05T20:30:06Z INFO symbol=MSFT status=ok headlines=10 sentiment=neutral
+2026-05-05T20:30:06Z INFO symbol=NVDA status=ok headlines=9 sentiment=neutral
+2026-05-05T20:30:06Z INFO symbol=NWG status=no_news_today
+2026-05-05T20:30:06Z INFO symbol=RGTI status=ok headlines=6 sentiment=neutral
+2026-05-05T20:30:07Z INFO symbol=SNOW status=ok headlines=3 sentiment=neutral
+2026-05-05T20:30:07Z INFO symbol=VOD status=ok headlines=7 sentiment=neutral
+2026-05-05T20:30:07Z INFO news_refresh finished at=2026-05-05T20:30:07.634191+00:00 duration_s=4.6 success=9 skipped=7 failed=0
+2026-05-06T20:30:03Z INFO news_refresh started at=2026-05-06T20:30:03.323184+00:00
+2026-05-06T20:30:03Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-05-06T20:30:04Z INFO symbol=AAPL status=ok headlines=10 sentiment=neutral
+2026-05-06T20:30:04Z INFO symbol=AMZN status=ok headlines=9 sentiment=neutral
+2026-05-06T20:30:05Z INFO symbol=ASC status=no_news_today
+2026-05-06T20:30:05Z INFO symbol=BA. status=ok headlines=1 sentiment=neutral
+2026-05-06T20:30:05Z INFO symbol=GOOG status=ok headlines=10 sentiment=neutral
+2026-05-06T20:30:05Z INFO symbol=GSK status=ok headlines=1 sentiment=neutral
+2026-05-06T20:30:06Z INFO symbol=HLN status=ok headlines=1 sentiment=neutral
+2026-05-06T20:30:06Z INFO symbol=ISF status=no_news_today
+2026-05-06T20:30:06Z INFO symbol=IUKD status=no_news_today
+2026-05-06T20:30:06Z INFO symbol=LLOY status=ok headlines=1 sentiment=neutral
+2026-05-06T20:30:06Z INFO symbol=MSFT status=ok headlines=9 sentiment=neutral
+2026-05-06T20:30:07Z INFO symbol=NVDA status=ok headlines=9 sentiment=neutral
+2026-05-06T20:30:07Z INFO symbol=NWG status=ok headlines=2 sentiment=neutral
+2026-05-06T20:30:07Z INFO symbol=RGTI status=ok headlines=3 sentiment=neutral
+2026-05-06T20:30:08Z INFO symbol=SNOW status=ok headlines=4 sentiment=neutral
+2026-05-06T20:30:08Z INFO symbol=VOD status=ok headlines=1 sentiment=neutral
+2026-05-06T20:30:08Z INFO news_refresh finished at=2026-05-06T20:30:08.526855+00:00 duration_s=5.2 success=13 skipped=3 failed=0
+2026-05-07T20:30:03Z INFO news_refresh started at=2026-05-07T20:30:03.116388+00:00
+2026-05-07T20:30:03Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-05-07T20:30:03Z INFO symbol=AAPL status=ok headlines=9 sentiment=neutral
+2026-05-07T20:30:04Z INFO symbol=AMZN status=ok headlines=9 sentiment=neutral
+2026-05-07T20:30:04Z INFO symbol=ASC status=no_news_today
+2026-05-07T20:30:04Z INFO symbol=BA. status=ok headlines=3 sentiment=neutral
+2026-05-07T20:30:04Z INFO symbol=GOOG status=ok headlines=10 sentiment=neutral
+2026-05-07T20:30:05Z INFO symbol=GSK status=no_news_today
+2026-05-07T20:30:05Z INFO symbol=HLN status=no_news_today
+2026-05-07T20:30:05Z INFO symbol=ISF status=no_news_today
+2026-05-07T20:30:05Z INFO symbol=IUKD status=no_news_today
+2026-05-07T20:30:05Z INFO symbol=LLOY status=ok headlines=1 sentiment=neutral
+2026-05-07T20:30:06Z INFO symbol=MSFT status=ok headlines=9 sentiment=neutral
+2026-05-07T20:30:06Z INFO symbol=NVDA status=ok headlines=8 sentiment=neutral
+2026-05-07T20:30:06Z INFO symbol=NWG status=ok headlines=1 sentiment=neutral
+2026-05-07T20:30:06Z INFO symbol=RGTI status=ok headlines=4 sentiment=neutral
+2026-05-07T20:30:07Z INFO symbol=SNOW status=ok headlines=3 sentiment=neutral
+2026-05-07T20:30:07Z INFO symbol=VOD status=ok headlines=1 sentiment=neutral
+2026-05-07T20:30:07Z INFO news_refresh finished at=2026-05-07T20:30:07.463676+00:00 duration_s=4.3 success=11 skipped=5 failed=0
+2026-05-08T20:30:03Z INFO news_refresh started at=2026-05-08T20:30:03.087415+00:00
+2026-05-08T20:30:03Z INFO symbols_to_refresh count=16 symbols=['AAPL', 'AMZN', 'ASC', 'BA.', 'GOOG', 'GSK', 'HLN', 'ISF', 'IUKD', 'LLOY', 'MSFT', 'NVDA', 'NWG', 'RGTI', 'SNOW', 'VOD']
+2026-05-08T20:30:04Z INFO symbol=AAPL status=ok headlines=10 sentiment=neutral
+2026-05-08T20:30:04Z INFO symbol=AMZN status=ok headlines=10 sentiment=neutral
+2026-05-08T20:30:04Z INFO symbol=ASC status=no_news_today
+2026-05-08T20:30:04Z INFO symbol=BA. status=no_news_today
+2026-05-08T20:30:05Z INFO symbol=GOOG status=ok headlines=10 sentiment=neutral
+2026-05-08T20:30:05Z INFO symbol=GSK status=ok headlines=2 sentiment=neutral
+2026-05-08T20:30:05Z INFO symbol=HLN status=no_news_today
+2026-05-08T20:30:05Z INFO symbol=ISF status=no_news_today
+2026-05-08T20:30:05Z INFO symbol=IUKD status=no_news_today
+2026-05-08T20:30:06Z INFO symbol=LLOY status=ok headlines=1 sentiment=neutral
+2026-05-08T20:30:06Z INFO symbol=MSFT status=ok headlines=10 sentiment=neutral
+2026-05-08T20:30:06Z INFO symbol=NVDA status=ok headlines=9 sentiment=neutral
+2026-05-08T20:30:06Z INFO symbol=NWG status=no_news_today
+2026-05-08T20:30:07Z INFO symbol=RGTI status=ok headlines=2 sentiment=neutral
+2026-05-08T20:30:07Z INFO symbol=SNOW status=ok headlines=4 sentiment=neutral
+2026-05-08T20:30:07Z INFO symbol=VOD status=ok headlines=2 sentiment=neutral
+2026-05-08T20:30:07Z INFO news_refresh finished at=2026-05-08T20:30:07.523699+00:00 duration_s=4.4 success=10 skipped=6 failed=0
