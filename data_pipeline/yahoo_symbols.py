@@ -18,6 +18,7 @@ YAHOO_SYMBOLS = {
     "NWG": "NWG.L",
     "NVDA": "NVDA",
     "RGTI": "RGTI",
+    "SNOW": "SNOW",
     "VOD": "VOD.L",
     "ARTEMIS GLOBAL INCOME": "0P0000W36K.L",
     "ARTEMIS HIGH INCOME": "0P0001GZXO.L",

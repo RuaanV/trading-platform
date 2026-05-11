@@ -1,0 +1,5 @@
+[2026-04-26 15:04:23] cowork_bridge.sh started (PID 40558, poll interval 10s)
+[2026-04-26 15:04:23] Watching for trigger at: /Users/ruaan.venter/Library/Application Support/Claude/local-agent-mode-sessions/ab64c463-b4c4-4f84-96c5-942e11413f41/ac211dbb-0c41-4748-82c2-4d217cd62659/agent/local_ditto_ac211dbb-0c41-4748-82c2-4d217cd62659/outputs/PORTFOLIO_REFRESH_TRIGGER
+[2026-04-26 15:05:44] Trigger detected — starting portfolio refresh
+[2026-04-26 15:05:50] Refresh SUCCEEDED (exit 0)
+[2026-04-26 15:05:50] Result written to PORTFOLIO_REFRESH_RESULT.txt
