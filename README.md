@@ -357,10 +357,26 @@ trading-platform/
 └── tests/
 ```
 
+## Setup
+
+The Python environment is managed with [uv](https://docs.astral.sh/uv/) (Python 3.13, pinned in `.python-version`).
+
+```bash
+brew install uv            # or: curl -LsSf https://astral.sh/uv/install.sh | sh
+make setup                 # uv sync: creates .venv from uv.lock (includes the dev group)
+make install-airflow       # optional: adds the Airflow group for the scaffolded DAG
+make db-init               # start local Postgres (Docker/OrbStack) and create portfolio tables
+```
+
+- Runtime dependencies are in `[project.dependencies]` of `pyproject.toml`; research tools (Jupyter, matplotlib, scikit-learn) are in the `dev` group; Airflow is in the opt-in `airflow` group.
+- Add a dependency with `uv add <pkg>` (or `uv add --group dev <pkg>`); commit `pyproject.toml` and `uv.lock` together.
+- `make outdated` lists newer releases; `make upgrade` refreshes the lockfile and syncs.
+
 ## Common Commands
 
 ```bash
 make setup
+make test
 make run-pipeline
 make run-recommender
 make run-agent

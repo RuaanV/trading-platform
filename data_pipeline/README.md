@@ -21,10 +21,10 @@ make setup
 set -a && source .env && set +a
 ```
 
-Default Python executable:
+Run scripts through uv so they use the locked project environment:
 
 ```bash
-.venv/bin/python
+uv run python <script.py>
 ```
 
 Database-backed scripts expect a reachable Postgres database, typically via:
@@ -75,7 +75,7 @@ make run-prices-apple
 or:
 
 ```bash
-PRICE_SYMBOL=AAPL PRICE_PROVIDER=both .venv/bin/python data_pipeline/ingest_prices.py
+PRICE_SYMBOL=AAPL PRICE_PROVIDER=both uv run python data_pipeline/ingest_prices.py
 ```
 
 Common environment variables:
@@ -139,7 +139,7 @@ make run-company
 or:
 
 ```bash
-.venv/bin/python data_pipeline/ingest_company_data.py
+uv run python data_pipeline/ingest_company_data.py
 ```
 
 Optional environment variables:
@@ -166,7 +166,7 @@ Current status:
 How to run:
 
 ```bash
-.venv/bin/python data_pipeline/ingest_fundamentals.py
+uv run python data_pipeline/ingest_fundamentals.py
 ```
 
 or as part of:
@@ -203,7 +203,7 @@ or:
 ```bash
 MARKET_CALENDAR_SYMBOLS=GOOG,MSFT,AAPL,AMZN,NVDA,BA.L \
 MARKET_CALENDAR_YEAR=2026 \
-.venv/bin/python data_pipeline/ingest_market_calendar.py
+uv run python data_pipeline/ingest_market_calendar.py
 ```
 
 Common environment variables:
@@ -299,7 +299,7 @@ make load-personal-portfolio
 or:
 
 ```bash
-.venv/bin/python data_pipeline/load_personal_portfolio.py
+uv run python data_pipeline/load_personal_portfolio.py
 ```
 
 Important notes:
@@ -335,7 +335,7 @@ PORTFOLIO_CASH_VALUE=7900.53 make add-cash-holding
 or:
 
 ```bash
-PORTFOLIO_CASH_VALUE=7900.53 .venv/bin/python data_pipeline/add_cash_holding.py
+PORTFOLIO_CASH_VALUE=7900.53 uv run python data_pipeline/add_cash_holding.py
 ```
 
 #### `cleanup_portfolio_snapshots.py`
@@ -355,7 +355,7 @@ Use this utility when:
 How to run:
 
 ```bash
-.venv/bin/python data_pipeline/cleanup_portfolio_snapshots.py
+uv run python data_pipeline/cleanup_portfolio_snapshots.py
 ```
 
 There is also a Make target listed in the root [`Makefile`](/Users/ruaan.venter/code/trading-platform/Makefile):

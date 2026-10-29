@@ -2,8 +2,10 @@
 
 from datetime import datetime
 
-from airflow import DAG
-from airflow.operators.python import PythonOperator
+# Airflow 3 imports: DAG lives in the Task SDK and PythonOperator moved to the
+# "standard" provider (the old airflow.operators.python path is deprecated in Airflow 3).
+from airflow.providers.standard.operators.python import PythonOperator
+from airflow.sdk import DAG
 
 from data_pipeline.ingest_fundamentals import ingest_fundamentals
 from data_pipeline.ingest_prices import ingest_prices

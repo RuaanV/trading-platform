@@ -1,18 +1,20 @@
-PYTHON ?= python3
-VENV ?= .venv
-PIP := $(VENV)/bin/pip
-PY := $(VENV)/bin/python
-STREAMLIT := $(VENV)/bin/streamlit
-DBT := $(VENV)/bin/dbt
+UV ?= uv
+PY := $(UV) run python
+STREAMLIT := $(UV) run streamlit
+DBT := $(UV) run dbt
 DBT_PROFILES_DIR := dbt
 
 .DEFAULT_GOAL := help
 
 help:
 	@echo "Available targets:"
-	@echo "  make setup              - create venv and install dependencies"
-	@echo "  make venv               - create .venv if missing"
-	@echo "  make install            - install/update requirements into .venv"
+	@echo "  make setup              - create .venv and install locked dependencies with uv (alias of install)"
+	@echo "  make install            - sync .venv to uv.lock (uv sync)"
+	@echo "  make install-airflow    - also install the optional Airflow dependency group"
+	@echo "  make lock               - re-resolve uv.lock after editing pyproject.toml"
+	@echo "  make outdated           - list direct dependencies with newer versions available"
+	@echo "  make upgrade            - upgrade all locked dependencies to latest allowed and sync"
+	@echo "  make test               - run the full unittest suite"
 	@echo "  make run-prices-apple   - fetch AAPL latest price using yfinance + Massive"
 	@echo "  make run-ingestion      - run price + fundamentals ingestion"
 	@echo "  make run-company        - ingest company data for AAPL, AMZN, GOOG, MSFT, and BA.L into Postgres raw tables"
@@ -41,15 +43,37 @@ help:
 	@echo "  make dbt-run            - execute dbt models"
 	@echo "  make test-aapl-pipeline - run company ingestion + dbt shaping for the AAPL/AMZN/GOOG/MSFT/BA.L set"
 	@echo "  make clean-artifacts    - remove generated model artifacts"
+	@echo "  make db-up              - start the local Postgres container (docker compose) and wait until healthy"
+	@echo "  make db-down            - stop the Postgres container (data is kept in the volume)"
+	@echo "  make db-status          - show container status and readiness"
+	@echo "  make db-shell           - open psql inside the container"
+	@echo "  make db-init            - start Postgres and create the portfolios table"
 
-setup: venv install
+setup: install
 
+# Kept as a prerequisite name for the run-* targets: just checks uv is available.
+# `uv run` creates/syncs .venv automatically from uv.lock.
 venv:
-	@if [ ! -d "$(VENV)" ]; then $(PYTHON) -m venv $(VENV); fi
+	@command -v $(UV) >/dev/null 2>&1 || { echo "uv is not installed - see https://docs.astral.sh/uv/getting-started/installation/"; exit 1; }
 
 install: venv
-	$(PIP) install --upgrade pip setuptools wheel
-	$(PIP) install -r requirements.txt
+	$(UV) sync
+
+install-airflow: venv
+	$(UV) sync --group airflow
+
+lock: venv
+	$(UV) lock
+
+outdated: venv
+	$(UV) tree --outdated --depth 1
+
+upgrade: venv
+	$(UV) lock --upgrade
+	$(UV) sync
+
+test: venv
+	$(PY) -m unittest $(basename $(subst /,.,$(wildcard tests/test_*.py)))
 
 run-ingestion: venv
 	$(PY) data_pipeline/ingest_prices.py
@@ -143,3 +167,23 @@ clean-artifacts:
 	rm -f models/trained_models/holding_performance_report.csv
 	rm -f models/trained_models/recommender_backtest_history.csv
 	rm -f models/trained_models/recommender_backtest_summary.csv
+
+db-up:
+	docker compose up -d postgres
+	@echo "Waiting for Postgres to become healthy..."
+	@until [ "$$(docker inspect -f '{{.State.Health.Status}}' trading-postgres 2>/dev/null)" = "healthy" ]; do sleep 1; done
+	@echo "Postgres is ready on localhost:$${POSTGRES_PORT:-5432}"
+
+db-down:
+	docker compose stop postgres
+
+db-status:
+	docker compose ps postgres
+	docker exec trading-postgres pg_isready
+
+db-shell:
+	docker exec -it trading-postgres psql -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-trading_platform}
+
+db-init: db-up init-portfolios
+
+.PHONY: setup venv install install-airflow lock outdated upgrade test db-up db-down db-status db-shell db-init
