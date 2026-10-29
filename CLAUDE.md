@@ -5,9 +5,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-make setup               # Create .venv and install dependencies
-make install             # Update requirements into existing .venv
+make setup               # Create .venv and install locked dependencies (uv sync)
+make install             # Re-sync .venv to uv.lock
+make install-airflow     # Also install the optional Airflow group
+make outdated            # Show direct dependencies with newer releases
+make upgrade             # Upgrade uv.lock to latest allowed versions and sync
 ```
+
+Dependencies are managed with uv: edit them with `uv add` / `uv remove` (never pip), and commit `pyproject.toml` + `uv.lock` together.
 
 Run pipeline stages:
 ```bash
@@ -27,6 +32,7 @@ make load-personal-portfolio # Seed/refresh SIPP portfolio from CSV + live price
 
 Run tests:
 ```bash
+make test                # Full unittest suite
 make test-recommender    # Recommender rules unit tests
 make test-analytics      # Analytics and backtesting unit tests
 make test-providers      # Price provider rate-limiting unit tests
@@ -34,10 +40,10 @@ make test-providers      # Price provider rate-limiting unit tests
 
 Run a single test file directly:
 ```bash
-.venv/bin/python -m unittest tests.test_generate_recommendations
+uv run python -m unittest tests.test_generate_recommendations
 ```
 
-All tests use the `unittest` framework. Always use `.venv/bin/python` to run scripts, not the system Python.
+All tests use the `unittest` framework. Always use `uv run python` (or `.venv/bin/python`) to run scripts, not the system Python.
 
 ## Architecture
 

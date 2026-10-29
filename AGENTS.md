@@ -49,8 +49,11 @@ Key locations:
 
 Default environment:
 
-- Virtualenv path: `.venv`
-- Python executable: `.venv/bin/python`
+- Python environment is managed by [uv](https://docs.astral.sh/uv/): dependencies live in `pyproject.toml`, pinned in `uv.lock`
+- Python version: 3.13 (see `.python-version`)
+- Virtualenv path: `.venv` (created and synced by `uv sync` / `make install`)
+- Add or change dependencies with `uv add <pkg>` / `uv remove <pkg>` (use `--group dev` for research-only tools), never `pip install`
+- Commit `pyproject.toml` and `uv.lock` together
 
 Use the `Makefile` where possible instead of re-creating command sequences manually.
 
@@ -58,6 +61,7 @@ Common commands:
 
 ```bash
 make setup
+make test
 make run-pipeline
 make run-recommender
 make run-agent
@@ -70,8 +74,10 @@ make test-analytics
 When running Python scripts directly, prefer:
 
 ```bash
-.venv/bin/python <script.py>
+uv run python <script.py>
 ```
+
+(`.venv/bin/python <script.py>` also works once `make install` has run, e.g. from cron.)
 
 ## Code Change Guidelines
 
