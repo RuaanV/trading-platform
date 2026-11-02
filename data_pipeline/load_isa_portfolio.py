@@ -68,7 +68,7 @@ from personal_portfolios import (
     fetch_portfolio_holdings,
     insert_portfolio_holdings_snapshot,
 )
-from yahoo_symbols import YAHOO_SYMBOLS
+from yahoo_symbols import YAHOO_SYMBOLS, is_sedol
 
 
 PORTFOLIO_NAME = "ISA"
@@ -208,6 +208,13 @@ def refresh_latest_snapshot() -> tuple[int, int] | None:
         provider_symbol = YAHOO_SYMBOLS.get(ticker) if selected_provider == "yahoo" else ticker
         resolved_symbol = None
         resolved_by = None
+
+        if not provider_symbol and is_sedol(ticker):
+            # Unmapped fund: a name search can match the wrong share class, so keep
+            # the last imported value until a verified mapping is added to YAHOO_SYMBOLS.
+            record["source_row"]["refresh_status"] = "carried_forward_unmapped_fund"
+            refreshed_rows.append(record)
+            continue
 
         if not provider_symbol:
             resolved_symbol = _resolve_symbol_from_apis(row["company"], row["instrument_name"])

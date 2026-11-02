@@ -12,6 +12,8 @@ venv/
 .ruff_cache/
 
 # Local env / secrets
+# Broker exports contain account numbers and holdings - never commit
+data/personal_portfolios/
 .env
 .env.*
 !.env.example

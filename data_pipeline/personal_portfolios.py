@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import csv
+import io
 import os
 import re
 import json
@@ -51,6 +53,8 @@ def _json_safe_value(value: object) -> object:
         return [_json_safe_value(item) for item in value]
     if hasattr(pd, "isna") and pd.isna(value):
         return None
+    if isinstance(value, Decimal):
+        return str(value)
     return value
 
 
@@ -512,6 +516,17 @@ def insert_portfolio_holdings_snapshot(
     fx_note: str | None,
 ) -> tuple[int, int]:
     engine = postgres_engine()
+    # Normalise every record before writing anything, so a row that can't be stored
+    # fails the import without leaving an empty snapshot behind.
+    records = []
+    for record in holdings_frame.to_dict(orient="records"):
+        normalized_record = record.copy()
+        normalized_record["as_of_date"] = (
+            None if pd.isna(normalized_record["as_of_date"]) else normalized_record["as_of_date"]
+        )
+        normalized_record["source_row"] = _normalize_json(normalized_record["source_row"])
+        records.append(normalized_record)
+
     snapshot_id = create_portfolio_snapshot(
         portfolio_id=portfolio_id,
         snapshot_at=snapshot_at,
@@ -520,7 +535,6 @@ def insert_portfolio_holdings_snapshot(
         source_name=source_name,
         fx_note=fx_note,
     )
-    records = holdings_frame.to_dict(orient="records")
 
     insert_sql = f"""
     insert into {PORTFOLIO_SCHEMA}.{HOLDINGS_TABLE} (
@@ -561,18 +575,111 @@ def insert_portfolio_holdings_snapshot(
     """
 
     with engine.begin() as conn:
-        for record in records:
-            normalized_record = record.copy()
-            normalized_record["as_of_date"] = (
-                None if pd.isna(normalized_record["as_of_date"]) else normalized_record["as_of_date"]
-            )
-            normalized_record["source_row"] = _normalize_json(normalized_record["source_row"])
+        for normalized_record in records:
             conn.execute(
                 text(insert_sql),
                 {"portfolio_id": portfolio_id, "snapshot_id": snapshot_id, **normalized_record},
             )
 
     return snapshot_id, len(records)
+
+
+HL_EXPORT_ENCODING = "latin-1"
+HL_HEADER_PREFIX = "Code,Stock,"
+HL_COLUMN_MAP = {
+    "code": "ticker",
+    "stock": "company",
+    "units_held": "quantity",
+    "price_pence": "price_pence",
+    "value": "market_value",
+    "cost": "total_cost",
+    "gain_loss": "gain_loss_value",
+    "gain_loss_pct": "gain_loss_pct",
+}
+
+
+def _hl_export_lines(csv_path: str | Path) -> list[str]:
+    return Path(csv_path).expanduser().read_text(encoding=HL_EXPORT_ENCODING).splitlines()
+
+
+def is_hl_export(csv_path: str | Path) -> bool:
+    """True for Hargreaves Lansdown 'portfolio summary' CSV downloads."""
+    lines = _hl_export_lines(csv_path)
+    return bool(lines) and lines[0].startswith("HL ") and any(
+        line.startswith(HL_HEADER_PREFIX) for line in lines
+    )
+
+
+def _hl_summary_value(lines: list[str], label: str) -> str | None:
+    for line in lines:
+        if line.startswith(label):
+            parts = next(csv.reader([line]))
+            return parts[1].strip() if len(parts) > 1 else None
+    return None
+
+
+def hl_export_created_at(csv_path: str | Path) -> datetime | None:
+    raw = _hl_summary_value(_hl_export_lines(csv_path), "Spreadsheet created at")
+    return datetime.strptime(raw, "%d-%m-%Y %H:%M") if raw else None
+
+
+def read_hl_holdings_export(csv_path: str | Path) -> pd.DataFrame:
+    """Parse an HL portfolio summary CSV into the platform's holdings columns.
+
+    HL downloads are Latin-1 encoded, start with an account summary block, quote
+    numbers with thousands separators, give prices in pence and end with a totals
+    row plus footnotes. Funds are identified by SEDOL in the Code column. Cash is
+    only reported in the summary block, so it is appended as a CASH holding.
+    """
+    lines = _hl_export_lines(csv_path)
+    header_index = next(i for i, line in enumerate(lines) if line.startswith(HL_HEADER_PREFIX))
+    table_lines = [lines[header_index]]
+    for line in lines[header_index + 1:]:
+        if not line.strip():
+            break
+        table_lines.append(line)
+
+    frame = pd.read_csv(io.StringIO("\n".join(table_lines)), thousands=",", dtype=str)
+    # "Gain/loss (£)" and "Gain/loss (%)" would otherwise normalise to the same name.
+    frame.columns = [_normalize_column_name(column.replace("%", "pct")) for column in frame.columns]
+    frame = frame.rename(columns=HL_COLUMN_MAP)
+    frame = frame[frame["ticker"].fillna("").str.strip() != ""]
+
+    holdings = pd.DataFrame({
+        "company": frame["company"].str.replace(r"\s*\*R$", "", regex=True).str.strip(),
+        "instrument_name": frame["company"].str.strip(),
+        "ticker": frame["ticker"].str.strip(),
+        "quantity": frame["quantity"],
+        "quantity_label": "Units",
+        "price": frame["price_pence"].map(_to_decimal).map(
+            lambda pence: (pence / Decimal("100")) if pence is not None else None
+        ),
+        "market_value": frame["market_value"],
+        "total_cost": frame["total_cost"],
+        "gain_loss_value": frame["gain_loss_value"],
+        "gain_loss_pct": frame["gain_loss_pct"],
+        "currency": "GBP",
+    })
+
+    cash = _hl_summary_value(lines, "Total cash:")
+    if cash and _to_decimal(cash):
+        holdings = pd.concat([holdings, pd.DataFrame([{
+            "company": "Cash",
+            "instrument_name": "Cash",
+            "ticker": "CASH",
+            "quantity": None,
+            "quantity_label": None,
+            "price": None,
+            "market_value": cash,
+            "total_cost": cash,
+            "gain_loss_value": "0",
+            "gain_loss_pct": "0",
+            "currency": "GBP",
+        }])], ignore_index=True)
+
+    created_at = hl_export_created_at(csv_path)
+    holdings["as_of_date"] = created_at.date().isoformat() if created_at else None
+    return holdings.reset_index(drop=True)
 
 
 def import_portfolio_holdings_from_csv(
@@ -594,7 +701,10 @@ def import_portfolio_holdings_from_csv(
         portfolio_type=portfolio_type,
     )
 
-    frame = pd.read_csv(Path(csv_path).expanduser())
+    if is_hl_export(csv_path):
+        frame = read_hl_holdings_export(csv_path)
+    else:
+        frame = pd.read_csv(Path(csv_path).expanduser())
     prepared = _prepare_holdings_frame(frame)
     return insert_portfolio_holdings_snapshot(
         portfolio_id=portfolio_id,
@@ -633,6 +743,15 @@ def ingest_personal_portfolio() -> None:
     ensure_personal_portfolio_tables()
 
     if csv_path:
+        if is_hl_export(csv_path):
+            # Default the snapshot time and source to what the HL download itself states.
+            created_at = hl_export_created_at(csv_path)
+            if not os.getenv("PORTFOLIO_SNAPSHOT_AT", "").strip() and created_at:
+                snapshot_at = created_at
+            source_updated_at = source_updated_at or created_at
+            source_name = source_name or "Hargreaves Lansdown"
+            quote_delay_note = quote_delay_note or "Shares at bid price delayed 15 minutes; funds at latest bid price"
+            fx_note = fx_note or "US holdings converted to GBP by HL at the export-date rate"
         snapshot_id, row_count = import_portfolio_holdings_from_csv(
             portfolio_name=name,
             holder=holder,

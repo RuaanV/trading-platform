@@ -420,3 +420,26 @@ The `data_pipeline` area is still evolving. Important current gaps:
 - there is no dedicated news ingestion pipeline yet
 - there is no general multi-portfolio scheduling or automation pipeline yet
 - some workflows are still specialised for the default SIPP portfolio instead of being fully generic
+
+
+## Importing Hargreaves Lansdown exports
+
+HL "portfolio summary" CSV downloads (SIPP or ISA) are detected automatically by
+`import_portfolio_holdings_from_csv`: the account summary block, totals row and
+footnotes are skipped, Latin-1 encoding and thousands separators are handled, prices
+are converted from pence to pounds, and `Total cash` is added as a `CASH` holding.
+The snapshot time defaults to the export's "Spreadsheet created at" timestamp.
+
+Save the downloads under `data/personal_portfolios/` (git-ignored), then:
+
+```bash
+make import-hl-sipp          # default file: data/personal_portfolios/hl_sipp_summary.csv
+make import-hl-isa           # default file: data/personal_portfolios/hl_isa_summary.csv
+make load-personal-portfolio # refresh SIPP with live prices
+make load-isa-portfolio      # refresh ISA with live prices
+```
+
+Override the file with `HL_SIPP_CSV=...` / `HL_ISA_CSV=...`. Funds are identified by
+SEDOL; verified SEDOL to Yahoo mappings live in `yahoo_symbols.YAHOO_SYMBOLS`. A fund
+without a mapping keeps its imported value on refresh (`carried_forward_unmapped_fund`)
+rather than risking a name search matching the wrong share class.

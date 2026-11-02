@@ -24,7 +24,7 @@ from personal_portfolios import (
     import_portfolio_holdings_from_csv,
     insert_portfolio_holdings_snapshot,
 )
-from yahoo_symbols import YAHOO_SYMBOLS
+from yahoo_symbols import YAHOO_SYMBOLS, is_sedol
 
 
 PORTFOLIO_NAME = "SIPP"
@@ -122,7 +122,12 @@ def _resolve_symbol_from_apis(company: str, instrument_name: object) -> dict[str
     return None
 
 
-def seed_reference_snapshot() -> tuple[int, int]:
+def seed_reference_snapshot() -> tuple[int | None, int]:
+    if not SEED_CSV_PATH.exists():
+        # Snapshots can instead be imported from an HL export (make import-hl-sipp).
+        print(f"Seed CSV not found at {SEED_CSV_PATH}; skipping seed and refreshing the latest imported snapshot.")
+        return None, 0
+
     snapshots = fetch_portfolio_snapshots()
     snapshot_times = pd.to_datetime(snapshots["snapshot_at"], utc=True).dt.tz_localize(None)
     existing_seed = snapshots[
@@ -156,7 +161,9 @@ def refresh_latest_snapshot_from_yahoo() -> tuple[int, int]:
     ].copy()
 
     if latest_holdings.empty:
-        raise ValueError("No existing holdings found to refresh.")
+        raise ValueError(
+            "No existing SIPP holdings found to refresh. Import an HL export first: make import-hl-sipp"
+        )
 
     portfolio_id = add_personal_portfolio(
         name=PORTFOLIO_NAME,
@@ -202,6 +209,13 @@ def refresh_latest_snapshot_from_yahoo() -> tuple[int, int]:
         provider_symbol = YAHOO_SYMBOLS.get(ticker) if selected_provider == "yahoo" else ticker
         resolved_symbol = None
         resolved_by = None
+
+        if not provider_symbol and is_sedol(ticker):
+            # Unmapped fund: a name search can match the wrong share class, so keep
+            # the last imported value until a verified mapping is added to YAHOO_SYMBOLS.
+            record["source_row"]["refresh_status"] = "carried_forward_unmapped_fund"
+            refreshed_rows.append(record)
+            continue
 
         if not provider_symbol:
             resolved_symbol = _resolve_symbol_from_apis(row["company"], row["instrument_name"])
