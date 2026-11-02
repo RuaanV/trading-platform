@@ -1,0 +1,18 @@
+HL Stocks & Shares ISA, , , ,
+Client Name:,Mr Test Investor, , ,
+Client Number:, 1234567, , ,
+Spreadsheet created at,15-01-2026 09:05, , ,
+
+Stock value:,"12,345.67", , ,
+Total cash:,"1,000.50", , ,
+Amount available to invest:,"900.00", , ,
+Total value:,"13,346.17", , ,
+
+Code,Stock,Units held,Price (pence),Value (£),Cost (£),Gain/loss (£),Gain/loss (%),
+"GOOG","Alphabet Inc NPV C *R","10","20,000.00","2,000.00","1,500.00","500.00","33.33"
+"LLOY","Lloyds Banking Group plc Ordinary 10p","1,500","98.50","1,477.50","1,200.00","277.50","23.13"
+"B41YBW7","Fundsmith Equity Class I - Accumulation (GBP)","1,196.350","742.46","8,882.37","7,000.00","1,882.37","26.89"
+"","Totals","","","12,359.87","9,700.00","2,659.87","27.42"
+
+"Shares are valued at the bid-price, delayed by 15 minutes. Funds are valued at the most recent bid-price."
+"*R This price has been converted to sterling at the rate shown below."

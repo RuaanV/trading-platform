@@ -38,6 +38,8 @@ help:
 	@echo "  make add-portfolio      - insert a portfolio or import holdings using PORTFOLIO_* env vars"
 	@echo "  make load-personal-portfolio - seed the SIPP portfolio and refresh live Yahoo Finance prices"
 	@echo "  make load-isa-portfolio - refresh the ISA portfolio prices (no-op until first CSV is imported)"
+	@echo "  make import-hl-sipp     - import an HL SIPP summary CSV as a snapshot (HL_SIPP_CSV=path)"
+	@echo "  make import-hl-isa      - import an HL ISA summary CSV as a snapshot (HL_ISA_CSV=path)"
 	@echo "  make add-cash-holding   - append the current cash balance as a portfolio holding"
 	@echo "  make cleanup-portfolio-snapshots - keep only the seed and latest SIPP snapshots"
 	@echo "  make dbt-run            - execute dbt models"
@@ -144,6 +146,15 @@ add-portfolio: venv
 load-personal-portfolio: venv
 	$(PY) data_pipeline/load_personal_portfolio.py
 
+HL_SIPP_CSV ?= data/personal_portfolios/hl_sipp_summary.csv
+HL_ISA_CSV ?= data/personal_portfolios/hl_isa_summary.csv
+
+import-hl-sipp: venv
+	PORTFOLIO_NAME=SIPP PORTFOLIO_HOLDER="Ruaan Venter" PORTFOLIO_TYPE=SIPP PORTFOLIO_CSV_PATH=$(HL_SIPP_CSV) $(PY) data_pipeline/personal_portfolios.py
+
+import-hl-isa: venv
+	PORTFOLIO_NAME=ISA PORTFOLIO_HOLDER="Ruaan Venter" PORTFOLIO_TYPE=ISA PORTFOLIO_CSV_PATH=$(HL_ISA_CSV) $(PY) data_pipeline/personal_portfolios.py
+
 load-isa-portfolio: venv
 	$(PY) data_pipeline/load_isa_portfolio.py
 
@@ -186,4 +197,4 @@ db-shell:
 
 db-init: db-up init-portfolios
 
-.PHONY: setup venv install install-airflow lock outdated upgrade test db-up db-down db-status db-shell db-init
+.PHONY: import-hl-sipp import-hl-isa setup venv install install-airflow lock outdated upgrade test db-up db-down db-status db-shell db-init
